@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: "intelli-note"
+  datasource:
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
+    url: "jdbc:mysql://localhost:3306/tax_course?useSSL=false&allowPublicKeyRetrieval=true"
+    username: "root"
+    password: "123456"
+    type: com.alibaba.druid.pool.DruidDataSource
+  jackson:
+    date-format: "yyyy-MM-dd HH:mm:ss"
+    time-zone: "GMT+8"
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 200MB
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    username: "guest"
+    password: "guest"
+    virtual-host: "intelli-note"
+  data:
+    redis:
+      host: "localhost"
+      port: 6379
+      password: "123456"
+      database: 0
+      client-type: lettuce
+  cache:
+    type: redis
+    redis:
+      use-key-prefix: true
+      key-prefix: "intelli-note_"
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+server:
+  port: 8080
+  servlet:
+    context-path: "/api"
+
+qiniu:
+  access-key: ""
+  secret-key: ""
+  bucket: ""
+  domain: ""
+
+logging:
+  pattern:
+    dateformat: "yyyy-MM-dd HH:mm:ss.SSS"
