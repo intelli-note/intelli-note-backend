@@ -3,7 +3,7 @@ spring:
     name: "intelli-note"
   datasource:
     driver-class-name: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://localhost:3306/tax_course?useSSL=false&allowPublicKeyRetrieval=true"
+    url: "jdbc:mysql://localhost:3306/intelli_note?useSSL=false&allowPublicKeyRetrieval=true"
     username: "root"
     password: "123456"
     type: com.alibaba.druid.pool.DruidDataSource
