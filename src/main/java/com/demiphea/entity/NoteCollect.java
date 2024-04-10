@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 笔记-in-合集表 实体类
+ * 合集收录表 实体类
  *
  * @author demiphea
  * @since 17.0.9
@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("note_in_collection")
-public class NoteInCollection {
+@TableName("note_collect")
+public class NoteCollect {
 
     /**
      * 笔记ID

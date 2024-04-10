@@ -53,7 +53,7 @@ public class User {
     private Boolean gender;
 
     /**
-     * 用户微信OpenID
+     * 用户微信OpenID，不可重复
      */
     @TableField("openid")
     private String openid;

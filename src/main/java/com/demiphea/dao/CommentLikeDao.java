@@ -5,7 +5,6 @@ import com.demiphea.entity.CommentLike;
 
 /**
  * 评论点赞表 Dao接口
- *
  * @author demiphea
  * @since 17.0.9
  */

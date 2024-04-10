@@ -1,6 +1,8 @@
 package com.demiphea.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +23,13 @@ import java.time.LocalDateTime;
 public class CollectionFavorite {
 
     /**
-     * 笔记ID
+     * 合集收藏联系ID
+     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
+
+    /**
+     * 合集ID
      */
     @TableField("collection_id")
     private Long collectionId;

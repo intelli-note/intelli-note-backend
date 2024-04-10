@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 public class NoteFavorite {
 
     /**
-     * 收藏联系ID
+     * 笔记收藏联系ID
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
