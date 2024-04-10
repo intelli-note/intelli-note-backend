@@ -43,8 +43,14 @@ public class Notice {
     /**
      * 关联笔记收藏表ID，可选
      */
-    @TableField("link_star_id")
-    private Long linkStarId;
+    @TableField("link_star_note_id")
+    private Long linkStarNoteId;
+
+    /**
+     * 关联合集收藏表ID，可选
+     */
+    @TableField("link_star_collection_id")
+    private Long linkStarCollectionId;
 
     /**
      * 关联评论表ID，可选
@@ -55,8 +61,8 @@ public class Notice {
     /**
      * 关联评论点赞表ID，可选
      */
-    @TableField("link_like_id")
-    private Long linkLikeId;
+    @TableField("link_comment_like_id")
+    private Long linkCommentLikeId;
 
     /**
      * 关联账单ID，可选

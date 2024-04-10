@@ -5,7 +5,6 @@ import com.demiphea.entity.User;
 
 /**
  * 用户表 Dao接口
- *
  * @author demiphea
  * @since 17.0.9
  */

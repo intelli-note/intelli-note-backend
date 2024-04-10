@@ -7,14 +7,14 @@ use intelli_note;
 -- 创建数据表
 create table tb_user
 (
-    id        bigint         not null comment '用户ID',
-    username  varchar(20)    not null comment '用户名，20字符内',
-    avatar    text           not null comment '用户头像url',
-    biography varchar(255)   null comment '用户简介，255字符内，可为空',
-    gender    boolean        null comment '性别：null-未知，true-男生，false-女生',
-    openid    varchar(130)   not null comment '用户微信OpenID',
-    balance   decimal(10, 2) not null comment '余额',
-    revenue   decimal(10, 2) not null comment '收入',
+    id        bigint              not null comment '用户ID',
+    username  varchar(20)         not null comment '用户名，20字符内',
+    avatar    text                not null comment '用户头像url',
+    biography varchar(255)        null comment '用户简介，255字符内，可为空',
+    gender    boolean             null comment '性别：null-未知，true-男生，false-女生',
+    openid    varchar(130) unique not null comment '用户微信OpenID，不可重复',
+    balance   decimal(10, 2)      not null comment '余额',
+    revenue   decimal(10, 2)      not null comment '收入',
 
     primary key (id)
 ) comment '用户表';
@@ -84,7 +84,7 @@ create table favorite
 
 create table note_favorite
 (
-    id          bigint   not null comment '收藏联系ID',
+    id bigint not null comment '笔记收藏联系ID',
     note_id     bigint   not null comment '笔记ID',
     favorite_id bigint   not null comment '收藏夹ID',
 
@@ -98,17 +98,19 @@ create table note_favorite
 
 create table collection_favorite
 (
-    collection_id bigint   not null comment '笔记ID',
+    id            bigint not null comment '合集收藏联系ID',
+    collection_id bigint not null comment '合集ID',
     favorite_id   bigint   not null comment '收藏夹ID',
 
     create_time   datetime not null comment '收藏时间',
 
-    primary key (collection_id, favorite_id),
+    unique (collection_id, favorite_id),
+    primary key (id),
     foreign key (collection_id) references collection (id) on update cascade on delete cascade,
     foreign key (favorite_id) references favorite (id) on update cascade on delete cascade
 ) comment '合集收藏表';
 
-create table note_in_collection
+create table note_collect
 (
     note_id       bigint not null comment '笔记ID',
     collection_id bigint not null comment '合集ID',
@@ -116,7 +118,7 @@ create table note_in_collection
     primary key (note_id, collection_id),
     foreign key (note_id) references note (id) on update cascade on delete cascade,
     foreign key (collection_id) references collection (id) on update cascade on delete cascade
-) comment '笔记-in-合集表';
+) comment '合集收录表';
 
 create table bill
 (
@@ -185,23 +187,25 @@ create table comment_like
 
 create table notice
 (
-    id              bigint   not null comment '通知ID',
-    type            bigint   not null comment '通知类型：0-关注通知，1-收藏通知，2-评论通知，3-点赞通知，4-交易通知',
-    link_follow_id  bigint   null comment '关联关注表ID，可选',
-    link_star_id    bigint   null comment '关联笔记收藏表ID，可选',
-    link_comment_id bigint   null comment '关联评论表ID，可选',
-    link_like_id    bigint   null comment '关联评论点赞表ID，可选',
-    link_bill_id    bigint   null comment '关联账单ID，可选',
+    id                      bigint   not null comment '通知ID',
+    type                    bigint   not null comment '通知类型：0-关注通知，1-收藏通知，2-评论通知，3-点赞通知，4-交易通知',
+    link_follow_id          bigint   null comment '关联关注表ID，可选',
+    link_star_note_id       bigint   null comment '关联笔记收藏表ID，可选',
+    link_star_collection_id bigint   null comment '关联合集收藏表ID，可选',
+    link_comment_id         bigint   null comment '关联评论表ID，可选',
+    link_comment_like_id    bigint   null comment '关联评论点赞表ID，可选',
+    link_bill_id            bigint   null comment '关联账单ID，可选',
 
-    user_id         bigint   not null comment '用户ID',
-    create_time     datetime not null comment '通知时间',
-    is_read         boolean  not null comment '是否已读',
+    user_id                 bigint   not null comment '用户ID',
+    create_time             datetime not null comment '通知时间',
+    is_read                 boolean  not null comment '是否已读',
 
     primary key (id),
     foreign key (user_id) references tb_user (id) on update cascade on delete cascade,
     foreign key (link_follow_id) references follow (id) on update cascade on delete set null,
-    foreign key (link_star_id) references note_favorite (id) on update cascade on delete set null,
+    foreign key (link_star_note_id) references note_favorite (id) on update cascade on delete set null,
+    foreign key (link_star_collection_id) references collection_favorite (id) on update cascade on delete set null,
     foreign key (link_comment_id) references tb_comment (id) on update cascade on delete set null,
-    foreign key (link_like_id) references comment_like (id) on update cascade on delete set null,
+    foreign key (link_comment_like_id) references comment_like (id) on update cascade on delete set null,
     foreign key (link_bill_id) references bill (id) on update cascade on delete set null
 ) comment '通知表';
