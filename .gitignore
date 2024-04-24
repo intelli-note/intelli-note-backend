@@ -31,4 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Nodejs ###
 /src/main/resources/latex/node_modules/
+
+### Dev File ###
+/src/main/resources/config/application-dev.yaml
