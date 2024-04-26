@@ -8,6 +8,7 @@ class IntelliNoteApplicationTests {
 
     @Test
     void contextLoads() {
+        throw new RuntimeException();
     }
 
 }
