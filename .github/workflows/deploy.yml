@@ -1,0 +1,49 @@
+name: Deploy
+
+on:
+  pull_request:
+    types:
+      - closed
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    
+    name: Deploy Project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Branch
+        uses: actions/checkout@v4.1.4
+        
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4.2.1
+        with: 
+          distribution: 'oracle'
+          java-version: '17'
+          cache: 'maven'
+        
+      - name: Package Project
+        run: mvn -B clean package
+
+      - name: Upload JAR Package And Run
+        env:
+          PROJECT_NAME: intelli-note
+        uses: cross-the-world/ssh-scp-ssh-pipelines@v1.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          pass: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          first_ssh: |
+            cd ~
+            if [ ! -d "./${{ env.PROJECT_NAME }}" ]; then mkdir ./${{ env.PROJECT_NAME }} && echo -e '\033[1;32mCreate '${{ env.PROJECT_NAME }}' Directory\033[0m'; fi;
+            cd ~/${{ env.PROJECT_NAME }}
+          scp: |
+            ./target/${{ env.PROJECT_NAME }}.jar => ~/${{ env.PROJECT_NAME }}/
+          last_ssh: |
+            cd ~/${{ env.PROJECT_NAME }}
+            PID=$(ps -ef | grep ${{ env.PROJECT_NAME }}.jar | grep -v grep | head -n 1 | awk '{printf $2}'); if [ -n "$PID" ];then kill -9 $PID && echo -e '\033[1;31mThe original Spring Boot Application Process has terminated its execution!\033[0m'; else echo -e '\033[1;33mNo Spring Boot Application Process found!\033[0m'; fi;
+            nohup java -jar ${{ env.PROJECT_NAME }}.jar > ${{ env.PROJECT_NAME }}.log 2>&1 &
+            
