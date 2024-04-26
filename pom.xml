@@ -223,6 +223,7 @@
     </dependencies>
 
     <build>
+        <finalName>intelli-note</finalName>
         <plugins>
             <plugin>
                 <groupId>org.graalvm.buildtools</groupId>
