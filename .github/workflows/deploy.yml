@@ -46,4 +46,4 @@ jobs:
             cd ~/${{ env.PROJECT_NAME }}
             PID=$(ps -ef | grep ${{ env.PROJECT_NAME }}.jar | grep -v grep | head -n 1 | awk '{printf $2}'); if [ -n "$PID" ];then kill -9 $PID && echo -e '\033[1;31mThe original Spring Boot Application Process has terminated its execution!\033[0m'; else echo -e '\033[1;33mNo Spring Boot Application Process found!\033[0m'; fi;
             nohup java -jar ${{ env.PROJECT_NAME }}.jar > ${{ env.PROJECT_NAME }}.log 2>&1 &
-            
+            echo -e '\033[1;32mSuccessfully run Spring Boot Application!\033[0m';
