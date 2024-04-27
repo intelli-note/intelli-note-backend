@@ -24,11 +24,19 @@ import java.util.List;
  * @since 17.0.9
  */
 @Component
-public class OssUtils {
+public final class OssUtils {
     private static OssProperty context;
     private static Auth auth;
     private static Configuration configuration;
 
+    /**
+     * 创建文件存储键
+     *
+     * @param directory 目录
+     * @param name      文件名
+     * @return {@link String} 存储键
+     * @author demiphea
+     */
     private static String createKey(List<String> directory, String name) {
         StringBuilder key = new StringBuilder();
         if (directory != null && !directory.isEmpty()) {
@@ -46,10 +54,22 @@ public class OssUtils {
         ).toString();
     }
 
+    /**
+     * 从存储url中解析文件存储键
+     * @param url 存储url
+     * @return {@link String} 文件存储键
+     * @author demiphea
+     */
     private static String parseKey(String url) {
         return url.replaceFirst("https://" + context.getDomain() + "/", "");
     }
 
+    /**
+     * 构建存储url
+     * @param key 文件存储键
+     * @return {@link String} 存储url
+     * @author demiphea
+     */
     private static String createUrl(String key) throws QiniuException {
         return new DownloadUrl(context.getDomain(), true, key).buildURL();
     }
