@@ -32,6 +32,12 @@ jobs:
       - name: Upload JAR Package And Run
         env:
           PROJECT_NAME: intelli-note
+          MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          OSS_ACCESS_KEY: ${{ secrets.OSS_ACCESS_KEY }}
+          OSS_SECRET_KEY: ${{ secrets.OSS_SECRET_KEY }}
+          OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
+          OSS_DOMAIN: ${{ secrets.OSS_DOMAIN }}
         uses: cross-the-world/ssh-scp-ssh-pipelines@v1.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -47,5 +53,5 @@ jobs:
           last_ssh: |
             cd ~/${{ env.PROJECT_NAME }}
             PID=$(ps -ef | grep ${{ env.PROJECT_NAME }}.jar | grep -v grep | head -n 1 | awk '{printf $2}'); if [ -n "$PID" ];then kill -9 $PID && echo -e '\033[1;31mThe original Spring Boot Application Process has terminated its execution!\033[0m'; else echo -e '\033[1;33mNo Spring Boot Application Process found!\033[0m'; fi;
-            nohup java -jar ${{ env.PROJECT_NAME }}.jar > ${{ env.PROJECT_NAME }}.log 2>&1 &
+            nohup java -jar ${{ env.PROJECT_NAME }}.jar --spring.profiles.active=prd --spring.datasource.username=$MYSQL_USERNAME --spring.datasource.password=$MYSQL_PASSWORD --oss.access-key=$OSS_ACCESS_KEY --oss.secret-key=$OSS_SECRET_KEY --oss.bucket=$OSS_BUCKET --oss.domain=$OSS_DOMAIN > ${{ env.PROJECT_NAME }}.log 2>&1 &
             
