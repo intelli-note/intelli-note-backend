@@ -38,10 +38,7 @@ class OssUtilsTest {
         mockOssUtils = mockStatic(OssUtils.class, Answers.CALLS_REAL_METHODS);
         Field context = OssUtils.class.getDeclaredField("context");
         context.setAccessible(true);
-        context.set(
-                null,
-                new OssProperty(ACCESS_KEY, SECRET_KEY, BUCKET, DOMAIN)
-        );
+        context.set(null, new OssProperty(ACCESS_KEY, SECRET_KEY, BUCKET, DOMAIN));
     }
 
     @AfterAll
@@ -53,37 +50,26 @@ class OssUtilsTest {
     static String createKey(List<String> directory, String name) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method createKey = OssUtils.class.getDeclaredMethod("createKey", List.class, String.class);
         createKey.setAccessible(true);
-        return (String) (createKey.invoke(
-                null,
-                directory,
-                name
-        ));
+        return (String) (createKey.invoke(null, directory, name));
     }
 
     static String createUrl(String key) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method createUrl = OssUtils.class.getDeclaredMethod("createUrl", String.class);
         createUrl.setAccessible(true);
-        return (String) (createUrl.invoke(
-                null,
-                key
-        ));
+        return (String) (createUrl.invoke(null, key));
     }
 
     static String parseKey(String url) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method parseKey = OssUtils.class.getDeclaredMethod("parseKey", String.class);
         parseKey.setAccessible(true);
-        return (String) (parseKey.invoke(
-                null,
-                url
-        ));
+        return (String) (parseKey.invoke(null, url));
     }
 
     @Test
     void upload() throws IOException {
-        final List<String> directory = List.of("mock-directory");
-        final String filename = "mock-filename";
-        MockMultipartFile file = new MockMultipartFile("mock-file.txt", "mock-file.txt", "text/plain", "mock-file-content".getBytes());
-
+        final List<String> DIRECTORY = List.of("mock-directory");
+        final String FILENAME = "mock-filename";
+        final MockMultipartFile FILE = new MockMultipartFile("mock-file.txt", "mock-file.txt", "text/plain", "mock-file-content".getBytes());
         Answer<String> answer = invocation -> {
             String key = createKey(
                     invocation.getArgument(0, List.class),
@@ -114,7 +100,7 @@ class OssUtilsTest {
                 .then(answer);
         assertEquals(
                 "https://" + DOMAIN + "/mock-directory/mock-filename",
-                OssUtils.upload(directory, filename, file.getBytes())
+                OssUtils.upload(DIRECTORY, FILENAME, FILE.getBytes())
         );
 
         // mock upload by input-stream
@@ -123,7 +109,7 @@ class OssUtilsTest {
                 .then(answer);
         assertEquals(
                 "https://" + DOMAIN + "/mock-directory/mock-filename",
-                OssUtils.upload(directory, filename, file.getInputStream())
+                OssUtils.upload(DIRECTORY, FILENAME, FILE.getInputStream())
         );
 
         // mock upload by multipart-file
@@ -132,7 +118,7 @@ class OssUtilsTest {
                 .then(answer);
         assertEquals(
                 "https://" + DOMAIN + "/mock-directory/mock-filename",
-                OssUtils.upload(directory, filename, file)
+                OssUtils.upload(DIRECTORY, FILENAME, FILE)
         );
 
         // mock upload with non-ful parameter
@@ -141,36 +127,30 @@ class OssUtilsTest {
                 .then(answer);
         assertEquals(
                 "https://" + DOMAIN + "/mock-filename",
-                OssUtils.upload(null, filename, file.getInputStream())
+                OssUtils.upload(null, FILENAME, FILE.getInputStream())
         );
         mockOssUtils
                 .when(() -> OssUtils.upload(anyList(), isNull(), any(InputStream.class)))
                 .then(answer);
-        assertDoesNotThrow(() -> OssUtils.upload(directory, null, file.getInputStream()));
+        assertDoesNotThrow(() -> OssUtils.upload(DIRECTORY, null, FILE.getInputStream()));
         mockOssUtils
                 .when(() -> OssUtils.upload(isNull(), isNull(), any(InputStream.class)))
                 .then(answer);
-        assertDoesNotThrow(() -> OssUtils.upload(null, null, file.getInputStream()));
+        assertDoesNotThrow(() -> OssUtils.upload(null, null, FILE.getInputStream()));
     }
 
     @Test
     void delete() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        final List<String> directory = List.of("mock-directory");
-        final String filename = "mock-filename";
+        final List<String> DIRECTORY = List.of("mock-directory");
+        final String FILENAME = "mock-filename";
 
-        assertEquals(
-                "mock-directory/mock-filename",
-                createKey(directory, filename)
-        );
+        assertEquals("mock-directory/mock-filename", createKey(DIRECTORY, FILENAME));
     }
 
     @Test
     void deleteByUrl() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        final String url = "https://" + DOMAIN + "/mock-key";
+        final String MOCK_URL = "https://" + DOMAIN + "/mock-key";
 
-        assertEquals(
-                "mock-key",
-                parseKey(url)
-        );
+        assertEquals("mock-key", parseKey(MOCK_URL));
     }
 }
