@@ -159,7 +159,7 @@ public final class OssUtils {
     }
 
     @Autowired
-    private void setContext(OssProperty context) {
+    private void initConfig(OssProperty context) {
         OssUtils.context = context;
         OssUtils.auth = Auth.create(context.getAccessKey(), context.getSecretKey());
         OssUtils.configuration = new Configuration(Region.createWithRegionId("cn-east-2"));
