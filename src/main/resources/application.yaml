@@ -3,6 +3,7 @@ spring:
     name: "intelli-note"
   profiles:
     active:
+      - prd
       - dev
   jackson:
     date-format: "yyyy-MM-dd HH:mm:ss"

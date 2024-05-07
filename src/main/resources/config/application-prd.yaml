@@ -2,18 +2,18 @@ spring:
   datasource:
     driver-class-name: "com.mysql.cj.jdbc.Driver"
     url: "jdbc:mysql://localhost:3306/intelli_note?useSSL=false&allowPublicKeyRetrieval=true"
-    username: "root"
-    password: "123456"
+    username: "your username"
+    password: "your password"
     type: com.alibaba.druid.pool.DruidDataSource
-  rabbitmq:
-    host: "localhost"
-    port: 5672
-    username: "guest"
-    password: "guest"
-    virtual-host: "intelli-note"
 
 oss:
-  access-key: ""
-  secret-key: ""
-  bucket: ""
-  domain: ""
+  access-key: "your access-key"
+  secret-key: "your secret-key"
+  bucket: "your bucket"
+  domain: "your domain (e.g., domain.example.com)"
+
+aliyun:
+  access-key: "your access-key"
+  secret-key: "your secret-key"
+  nls:
+    app-key: "your nls project app-key"

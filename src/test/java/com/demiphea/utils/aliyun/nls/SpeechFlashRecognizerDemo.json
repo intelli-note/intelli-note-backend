@@ -1,0 +1,109 @@
+{
+  "task_id": "24e5043123754ea4bf25ae0e95397608",
+  "result": "",
+  "status": 20000000,
+  "message": "SUCCESS",
+  "flash_result": {
+    "duration": 31555,
+    "completed": true,
+    "sentences": [
+      {
+        "text": "章鱼哥，",
+        "begin_time": 0,
+        "end_time": 730,
+        "channel_id": 0
+      },
+      {
+        "text": "你能不能那个在后边，",
+        "begin_time": 730,
+        "end_time": 2920,
+        "channel_id": 0
+      },
+      {
+        "text": "这，",
+        "begin_time": 2920,
+        "end_time": 3163,
+        "channel_id": 0
+      },
+      {
+        "text": "你想让我把你推下去，",
+        "begin_time": 3163,
+        "end_time": 5353,
+        "channel_id": 0
+      },
+      {
+        "text": "掉进那光刺海胆里。",
+        "begin_time": 5353,
+        "end_time": 7300,
+        "channel_id": 0
+      },
+      {
+        "text": "哎，",
+        "begin_time": 7300,
+        "end_time": 7543,
+        "channel_id": 0
+      },
+      {
+        "text": "好了，",
+        "begin_time": 7543,
+        "end_time": 8030,
+        "channel_id": 0
+      },
+      {
+        "text": "他转身就走了，",
+        "begin_time": 8030,
+        "end_time": 9490,
+        "channel_id": 0
+      },
+      {
+        "text": "像下定了某种决心，",
+        "begin_time": 9770,
+        "end_time": 11520,
+        "channel_id": 0
+      },
+      {
+        "text": "再也没有看我一眼。",
+        "begin_time": 11520,
+        "end_time": 13270,
+        "channel_id": 0
+      },
+      {
+        "text": "离开在字典里的解释是，",
+        "begin_time": 13800,
+        "end_time": 16950,
+        "channel_id": 0
+      },
+      {
+        "text": "和一个人或者一个地方分开。",
+        "begin_time": 17230,
+        "end_time": 20010,
+        "channel_id": 0
+      },
+      {
+        "text": "我想就是在那一刻，",
+        "begin_time": 20580,
+        "end_time": 22233,
+        "channel_id": 0
+      },
+      {
+        "text": "我一下子明白了什么叫做离开。",
+        "begin_time": 22233,
+        "end_time": 24920,
+        "channel_id": 0
+      },
+      {
+        "text": "谢谢章鱼哥，",
+        "begin_time": 25990,
+        "end_time": 28380,
+        "channel_id": 0
+      },
+      {
+        "text": "抖音。",
+        "begin_time": 29290,
+        "end_time": 30250,
+        "channel_id": 0
+      }
+    ],
+    "latency": 1135
+  }
+}
