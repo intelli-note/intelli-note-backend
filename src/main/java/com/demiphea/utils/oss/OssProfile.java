@@ -7,7 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * OssProperty
+ * OssProfile
+ * 七牛云OSS配置项
  *
  * @author demiphea
  * @since 17.0.9
@@ -17,9 +18,10 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OssProperty {
+public class OssProfile {
     private String accessKey;
     private String secretKey;
     private String bucket;
+    private String region;
     private String domain;
 }
