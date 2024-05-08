@@ -2,19 +2,15 @@ package com.demiphea.utils.network;
 
 import com.alibaba.fastjson2.JSON;
 import com.demiphea.exception.utils.network.FormTypeException;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.mime.*;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.*;
 import org.apache.hc.core5.net.URIBuilder;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +27,6 @@ import java.util.Map;
  * @author demiphea
  * @since 17.0.9
  */
-@Component
 public class HttpUtils {
     private static CloseableHttpClient client;
 
@@ -652,15 +647,5 @@ public class HttpUtils {
         String str = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
         response.close();
         return str;
-    }
-
-    @PostConstruct
-    private static void init() {
-        client = HttpClients.createDefault();
-    }
-
-    @PreDestroy
-    private static void destroy() throws IOException {
-        client.close();
     }
 }

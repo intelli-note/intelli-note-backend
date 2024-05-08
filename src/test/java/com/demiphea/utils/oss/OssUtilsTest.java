@@ -29,6 +29,7 @@ class OssUtilsTest {
     private static final String ACCESS_KEY = "mock-ak";
     private static final String SECRET_KEY = "mock-sk";
     private static final String BUCKET = "mock-bucket";
+    private static final String REGION = "mock-region";
     private static final String DOMAIN = "www.mock-url.com";
 
     static MockedStatic<OssUtils> mockOssUtils;
@@ -36,9 +37,9 @@ class OssUtilsTest {
     @BeforeAll
     static void beforeAll() throws NoSuchFieldException, IllegalAccessException {
         mockOssUtils = mockStatic(OssUtils.class, Answers.CALLS_REAL_METHODS);
-        Field context = OssUtils.class.getDeclaredField("context");
-        context.setAccessible(true);
-        context.set(null, new OssProperty(ACCESS_KEY, SECRET_KEY, BUCKET, DOMAIN));
+        Field profile = OssUtils.class.getDeclaredField("profile");
+        profile.setAccessible(true);
+        profile.set(null, new OssProfile(ACCESS_KEY, SECRET_KEY, BUCKET, REGION, DOMAIN));
     }
 
     @AfterAll

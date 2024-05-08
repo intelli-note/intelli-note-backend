@@ -3,11 +3,12 @@ package com.demiphea.utils.oss;
 import cn.hutool.core.util.RandomUtil;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
-import com.qiniu.storage.*;
+import com.qiniu.storage.BucketManager;
+import com.qiniu.storage.Configuration;
+import com.qiniu.storage.DownloadUrl;
+import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -23,9 +24,8 @@ import java.util.List;
  * @author demiphea
  * @since 17.0.9
  */
-@Component
 public final class OssUtils {
-    private static OssProperty context;
+    private static OssProfile profile;
     private static Auth auth;
     private static Configuration configuration;
 
@@ -61,7 +61,7 @@ public final class OssUtils {
      * @author demiphea
      */
     private static String parseKey(String url) {
-        return url.replaceFirst("https://" + context.getDomain() + "/", "");
+        return url.replaceFirst("https://" + profile.getDomain() + "/", "");
     }
 
     /**
@@ -71,7 +71,7 @@ public final class OssUtils {
      * @author demiphea
      */
     private static String createUrl(String key) throws QiniuException {
-        return new DownloadUrl(context.getDomain(), true, key).buildURL();
+        return new DownloadUrl(profile.getDomain(), true, key).buildURL();
     }
 
     /**
@@ -87,7 +87,7 @@ public final class OssUtils {
     public static String upload(List<String> directory, String name, byte[] file) throws QiniuException {
         UploadManager uploadManager = new UploadManager(configuration);
         DefaultPutRet putRet = new Gson().fromJson(
-                uploadManager.put(file, createKey(directory, name), auth.uploadToken(context.getBucket())).bodyString(),
+                uploadManager.put(file, createKey(directory, name), auth.uploadToken(profile.getBucket())).bodyString(),
                 DefaultPutRet.class
         );
         return createUrl(putRet.key);
@@ -105,7 +105,7 @@ public final class OssUtils {
     public static String upload(List<String> directory, String name, InputStream file) throws QiniuException {
         UploadManager uploadManager = new UploadManager(configuration);
         DefaultPutRet putRet = new Gson().fromJson(
-                uploadManager.put(file, createKey(directory, name), auth.uploadToken(context.getBucket()), null, null).bodyString(),
+                uploadManager.put(file, createKey(directory, name), auth.uploadToken(profile.getBucket()), null, null).bodyString(),
                 DefaultPutRet.class
         );
         return createUrl(putRet.key);
@@ -124,7 +124,7 @@ public final class OssUtils {
     public static String upload(List<String> directory, String name, MultipartFile file) throws IOException {
         UploadManager uploadManager = new UploadManager(configuration);
         DefaultPutRet putRet = new Gson().fromJson(
-                uploadManager.put(file.getInputStream(), createKey(directory, name), auth.uploadToken(context.getBucket()), null, null).bodyString(),
+                uploadManager.put(file.getInputStream(), createKey(directory, name), auth.uploadToken(profile.getBucket()), null, null).bodyString(),
                 DefaultPutRet.class
         );
         return createUrl(putRet.key);
@@ -132,7 +132,7 @@ public final class OssUtils {
 
     private static void delete(String key) throws QiniuException {
         BucketManager bucketManager = new BucketManager(auth, configuration);
-        bucketManager.delete(context.getBucket(), key);
+        bucketManager.delete(profile.getBucket(), key);
     }
 
     /**
@@ -144,7 +144,7 @@ public final class OssUtils {
      */
     public static void delete(List<String> directory, String name) throws QiniuException {
         BucketManager bucketManager = new BucketManager(auth, configuration);
-        bucketManager.delete(context.getBucket(), createKey(directory, name));
+        bucketManager.delete(profile.getBucket(), createKey(directory, name));
     }
 
     /**
@@ -155,14 +155,6 @@ public final class OssUtils {
      */
     public static void deleteByUrl(String url) throws QiniuException {
         BucketManager bucketManager = new BucketManager(auth, configuration);
-        bucketManager.delete(context.getBucket(), parseKey(url));
-    }
-
-    @Autowired
-    private void initConfig(OssProperty context) {
-        OssUtils.context = context;
-        OssUtils.auth = Auth.create(context.getAccessKey(), context.getSecretKey());
-        OssUtils.configuration = new Configuration(Region.createWithRegionId("cn-east-2"));
-        OssUtils.configuration.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;
+        bucketManager.delete(profile.getBucket(), parseKey(url));
     }
 }

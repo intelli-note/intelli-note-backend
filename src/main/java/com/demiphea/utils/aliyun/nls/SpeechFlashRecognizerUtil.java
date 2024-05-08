@@ -4,13 +4,10 @@ import cn.hutool.core.map.MapBuilder;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.nls.client.AccessToken;
-import com.demiphea.utils.aliyun.AliyunProfile;
 import com.demiphea.utils.aliyun.ApiCenter;
 import com.demiphea.utils.network.HttpUtils;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -32,7 +29,6 @@ import java.util.Map;
  * @author demiphea
  * @since 17.0.9
  */
-@Component
 public class SpeechFlashRecognizerUtil {
     private static final String URL = ApiCenter.NLS_SPEECH_FLASH_RECOGNIZER.URL;
     private static final String HOST = ApiCenter.NLS_SPEECH_FLASH_RECOGNIZER.HOST;
@@ -144,12 +140,6 @@ public class SpeechFlashRecognizerUtil {
                 .build();
         String response = HttpUtils.simplePost(URL, parameters, headers, null);
         return JSON.parseObject(response);
-    }
-
-    @Autowired
-    private void initConfig(AliyunProfile aliyunProfile, NLSProfile nlsProfile) {
-        SpeechFlashRecognizerUtil.accessToken = new AccessToken(aliyunProfile.getAccessKey(), aliyunProfile.getSecretKey());
-        SpeechFlashRecognizerUtil.appKey = nlsProfile.getAppKey();
     }
 
     /**

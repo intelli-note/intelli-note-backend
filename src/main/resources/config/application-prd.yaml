@@ -10,6 +10,7 @@ oss:
   access-key: "your access-key"
   secret-key: "your secret-key"
   bucket: "your bucket"
+  region: "your bucket region id" # https://developer.qiniu.com/kodo/1671/region-endpoint-fq
   domain: "your domain (e.g., domain.example.com)"
 
 aliyun:
