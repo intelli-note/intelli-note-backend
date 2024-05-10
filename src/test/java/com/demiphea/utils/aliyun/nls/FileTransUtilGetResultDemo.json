@@ -1,0 +1,103 @@
+{
+  "TaskId": "43db8bc66c6d4e8db7498c8e71abb337",
+  "RequestId": "307930A0-1FA6-5890-883D-F3536FB5EA57",
+  "StatusText": "SUCCESS",
+  "BizDuration": 31555,
+  "SolveTime": 1715356444592,
+  "RequestTime": 1715356442627,
+  "StatusCode": 21050000,
+  "Result": {
+    "Sentences": [
+      {
+        "EndTime": 7400,
+        "SilenceDuration": 0,
+        "SpeakerId": "1",
+        "BeginTime": 0,
+        "Text": "章鱼哥，你能不能那个在后边这你想让我把你推下去，掉进那筐刺海胆里。",
+        "ChannelId": 0,
+        "SpeechRate": 243,
+        "EmotionValue": 6.9
+      },
+      {
+        "EndTime": 9620,
+        "SilenceDuration": 0,
+        "SpeakerId": "1",
+        "BeginTime": 7400,
+        "Text": "哎，好了，他转身就走了。",
+        "ChannelId": 0,
+        "SpeechRate": 243,
+        "EmotionValue": 6.9
+      },
+      {
+        "EndTime": 13220,
+        "SilenceDuration": 0,
+        "SpeakerId": "1",
+        "BeginTime": 9640,
+        "Text": "像下定了某种决心，再也没有看我一眼。",
+        "ChannelId": 0,
+        "SpeechRate": 268,
+        "EmotionValue": 7.4
+      },
+      {
+        "EndTime": 14900,
+        "SilenceDuration": 0,
+        "SpeakerId": "1",
+        "BeginTime": 13680,
+        "Text": "离开。",
+        "ChannelId": 0,
+        "SpeechRate": 98,
+        "EmotionValue": 7.3
+      },
+      {
+        "EndTime": 16940,
+        "SilenceDuration": 0,
+        "SpeakerId": "1",
+        "BeginTime": 15100,
+        "Text": "在字典里的解释是。",
+        "ChannelId": 0,
+        "SpeechRate": 260,
+        "EmotionValue": 7.5
+      },
+      {
+        "EndTime": 20060,
+        "SilenceDuration": 0,
+        "SpeakerId": "1",
+        "BeginTime": 17000,
+        "Text": "和一个人或者一个地方分开。",
+        "ChannelId": 0,
+        "SpeechRate": 235,
+        "EmotionValue": 7.5
+      },
+      {
+        "EndTime": 24840,
+        "SilenceDuration": 0,
+        "SpeakerId": "1",
+        "BeginTime": 20440,
+        "Text": "我想，就是在那一刻，我一下子明白了什么叫做离开。",
+        "ChannelId": 0,
+        "SpeechRate": 286,
+        "EmotionValue": 7.6
+      },
+      {
+        "EndTime": 28480,
+        "SilenceDuration": 2,
+        "SpeakerId": "1",
+        "BeginTime": 26860,
+        "Text": "谢谢章鱼哥。",
+        "ChannelId": 0,
+        "SpeechRate": 185,
+        "EmotionValue": 7.1
+      },
+      {
+        "EndTime": 30360,
+        "SilenceDuration": 0,
+        "SpeakerId": "1",
+        "BeginTime": 29220,
+        "Text": "抖音。",
+        "ChannelId": 0,
+        "SpeechRate": 105,
+        "EmotionValue": 6.3
+      }
+    ]
+  }
+}
