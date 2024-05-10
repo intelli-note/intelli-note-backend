@@ -2,6 +2,7 @@ package com.demiphea.config;
 
 import com.alibaba.nls.client.AccessToken;
 import com.demiphea.utils.aliyun.AliyunProfile;
+import com.demiphea.utils.aliyun.nls.FileTransUtil;
 import com.demiphea.utils.aliyun.nls.NLSProfile;
 import com.demiphea.utils.aliyun.nls.SpeechFlashRecognizerUtil;
 import com.demiphea.utils.network.HttpUtils;
@@ -109,11 +110,21 @@ public class ApplicationStatusListener {
 
     private void initAliyunUtils() {
         log.info("Init SpeechFlashRecognizerUtil...");
-        CommonReflectionUtils.setStaticFieldValue(SpeechFlashRecognizerUtil.class,
+        Class<SpeechFlashRecognizerUtil> sfruClass = SpeechFlashRecognizerUtil.class;
+        CommonReflectionUtils.setStaticFieldValue(sfruClass,
                 "accessToken", new AccessToken(aliyunProfile.getAccessKey(), aliyunProfile.getSecretKey())
         );
-        CommonReflectionUtils.setStaticFieldValue(SpeechFlashRecognizerUtil.class,
+        CommonReflectionUtils.setStaticFieldValue(sfruClass,
                 "appKey", nlsProfile.getAppKey()
+        );
+
+        log.info("Init FileTransUtil...");
+        Class<FileTransUtil> ftuClass = FileTransUtil.class;
+        CommonReflectionUtils.setStaticFieldValue(ftuClass,
+                "appKey", nlsProfile.getAppKey()
+        );
+        CommonReflectionUtils.setStaticFieldValue(ftuClass,
+                "aliyunProfile", aliyunProfile
         );
     }
 
