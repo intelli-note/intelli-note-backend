@@ -1,4 +1,4 @@
-package com.demiphea.utils.oss;
+package com.demiphea.utils.oss.qiniu;
 
 import cn.hutool.core.util.RandomUtil;
 import com.google.gson.Gson;

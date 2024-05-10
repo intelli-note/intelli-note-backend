@@ -1,4 +1,4 @@
-package com.demiphea.utils.oss;
+package com.demiphea.utils.oss.qiniu;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
