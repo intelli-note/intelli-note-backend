@@ -16,7 +16,7 @@ oss:
 minio:
   access-key: "your access-key"
   secret-key: "your secret-key"
-  endpoint: "your minio server endpoint"
+  endpoint: "www.minio.io" # your minio server endpoint
   bucket: "your bucket"
 
 aliyun:
