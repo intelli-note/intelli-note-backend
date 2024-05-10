@@ -198,7 +198,7 @@ public class FileTransUtil {
     }
 
     /**
-     * 音频任务识别状态
+     * 响应业务状态
      *
      * @author demiphea
      * @since 17.0.9
