@@ -1,6 +1,8 @@
 package com.demiphea.utils.oss;
 
 import cn.hutool.crypto.digest.DigestUtil;
+import com.demiphea.utils.oss.qiniu.OssProfile;
+import com.demiphea.utils.oss.qiniu.OssUtils;
 import com.google.gson.Gson;
 import com.qiniu.storage.model.DefaultPutRet;
 import org.junit.jupiter.api.AfterAll;

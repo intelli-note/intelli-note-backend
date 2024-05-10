@@ -5,12 +5,15 @@ import com.demiphea.utils.aliyun.AliyunProfile;
 import com.demiphea.utils.aliyun.nls.NLSProfile;
 import com.demiphea.utils.aliyun.nls.SpeechFlashRecognizerUtil;
 import com.demiphea.utils.network.HttpUtils;
-import com.demiphea.utils.oss.OssProfile;
-import com.demiphea.utils.oss.OssUtils;
+import com.demiphea.utils.oss.minio.MinioProfile;
+import com.demiphea.utils.oss.minio.MinioUtils;
+import com.demiphea.utils.oss.qiniu.OssProfile;
+import com.demiphea.utils.oss.qiniu.OssUtils;
 import com.demiphea.utils.reflect.CommonReflectionUtils;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.util.Auth;
+import io.minio.MinioClient;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -35,16 +38,19 @@ public class ApplicationStatusListener {
     private final OssProfile ossProfile;
     private final AliyunProfile aliyunProfile;
     private final NLSProfile nlsProfile;
+    private final MinioProfile minioProfile;
 
     @PostConstruct
     private void postApplicationStart() {
         initOssUtils();
+        initMinioUtils();
         initHttpUtils();
         initAliyunUtils();
     }
 
     @PreDestroy
-    private void preApplicationDestroy() throws IOException {
+    private void preApplicationDestroy() throws Exception {
+        destroyMinioUtils();
         destroyHttpUtils();
     }
 
@@ -62,6 +68,30 @@ public class ApplicationStatusListener {
         CommonReflectionUtils.setStaticFieldValue(clazz,
                 "configuration", configuration
         );
+    }
+
+    private void initMinioUtils() {
+        log.info("Init MinioUtils...");
+        Class<MinioUtils> clazz = MinioUtils.class;
+        MinioClient client = MinioClient.builder()
+                .endpoint(minioProfile.getEndpoint())
+                .credentials(minioProfile.getAccessKey(), minioProfile.getSecretKey())
+                .build();
+        CommonReflectionUtils.setStaticFieldValue(clazz,
+                "client", client
+        );
+        CommonReflectionUtils.setStaticFieldValue(clazz,
+                "bucket", minioProfile.getBucket()
+        );
+        CommonReflectionUtils.setStaticFieldValue(clazz,
+                "url", minioProfile.getEndpoint() + "/" + minioProfile.getBucket() + "/"
+        );
+    }
+
+    private void destroyMinioUtils() throws Exception {
+        log.info("Destroy MinioUtils...");
+        MinioClient client = (MinioClient) CommonReflectionUtils.getStaticFieldValue(MinioUtils.class, "client");
+        client.close();
     }
 
     private void initHttpUtils() {

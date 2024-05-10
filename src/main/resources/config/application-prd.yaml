@@ -13,6 +13,12 @@ oss:
   region: "your bucket region id" # https://developer.qiniu.com/kodo/1671/region-endpoint-fq
   domain: "your domain (e.g., domain.example.com)"
 
+minio:
+  access-key: "your access-key"
+  secret-key: "your secret-key"
+  endpoint: "your minio server endpoint"
+  bucket: "your bucket"
+
 aliyun:
   access-key: "your access-key"
   secret-key: "your secret-key"
