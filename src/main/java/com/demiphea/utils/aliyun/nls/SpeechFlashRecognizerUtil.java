@@ -1,19 +1,24 @@
 package com.demiphea.utils.aliyun.nls;
 
 import cn.hutool.core.map.MapBuilder;
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.nls.client.AccessToken;
+import com.demiphea.exception.utils.aliyun.ApiResponseCodeStatusException;
+import com.demiphea.exception.utils.aliyun.ApiServiceCodeStatusException;
 import com.demiphea.utils.aliyun.ApiCenter;
 import com.demiphea.utils.network.HttpUtils;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -59,6 +64,21 @@ public class SpeechFlashRecognizerUtil {
                 .build();
     }
 
+    private static JSONObject parseResponse(ClassicHttpResponse response) throws IOException, ParseException {
+        if (HttpStatus.SC_OK != response.getCode()) {
+            throw new ApiResponseCodeStatusException("调用接口失败，响应码：" + response.getCode());
+        }
+        String res = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+        response.close();
+
+        JSONObject result = JSONObject.parseObject(res);
+        int statusCode = result.getIntValue("status");
+        if (Status.SUCCESS.code != statusCode) {
+            throw new ApiServiceCodeStatusException("识别失败(" + statusCode + "): " + result.getString("message"));
+        }
+        return result;
+    }
+
     /**
      * 接口调用
      *
@@ -70,8 +90,8 @@ public class SpeechFlashRecognizerUtil {
     public static JSONObject call(File file, Format format) throws IOException, URISyntaxException, ParseException {
         Map<String, String> parameters = parameters(format);
         Map<String, Object> headers = headers();
-        String response = HttpUtils.simpleFilePost(URL, parameters, headers, file, ContentType.APPLICATION_OCTET_STREAM);
-        return JSON.parseObject(response);
+        ClassicHttpResponse response = HttpUtils.filePost(URL, parameters, headers, file, ContentType.APPLICATION_OCTET_STREAM);
+        return parseResponse(response);
     }
 
     /**
@@ -85,8 +105,8 @@ public class SpeechFlashRecognizerUtil {
     public static JSONObject call(byte[] file, Format format) throws IOException, URISyntaxException, ParseException {
         Map<String, String> parameters = parameters(format);
         Map<String, Object> headers = headers();
-        String response = HttpUtils.simpleFilePost(URL, parameters, headers, file, ContentType.APPLICATION_OCTET_STREAM);
-        return JSON.parseObject(response);
+        ClassicHttpResponse response = HttpUtils.filePost(URL, parameters, headers, file, ContentType.APPLICATION_OCTET_STREAM);
+        return parseResponse(response);
     }
 
     /**
@@ -100,8 +120,8 @@ public class SpeechFlashRecognizerUtil {
     public static JSONObject call(InputStream file, Format format) throws IOException, URISyntaxException, ParseException {
         Map<String, String> parameters = parameters(format);
         Map<String, Object> headers = headers();
-        String response = HttpUtils.simpleFilePost(URL, parameters, headers, file, ContentType.APPLICATION_OCTET_STREAM);
-        return JSON.parseObject(response);
+        ClassicHttpResponse response = HttpUtils.filePost(URL, parameters, headers, file, ContentType.APPLICATION_OCTET_STREAM);
+        return parseResponse(response);
     }
 
     /**
@@ -115,8 +135,8 @@ public class SpeechFlashRecognizerUtil {
     public static JSONObject call(MultipartFile file, Format format) throws IOException, URISyntaxException, ParseException {
         Map<String, String> parameters = parameters(format);
         Map<String, Object> headers = headers();
-        String response = HttpUtils.simpleFilePost(URL, parameters, headers, file.getInputStream(), ContentType.APPLICATION_OCTET_STREAM);
-        return JSON.parseObject(response);
+        ClassicHttpResponse response = HttpUtils.filePost(URL, parameters, headers, file.getInputStream(), ContentType.APPLICATION_OCTET_STREAM);
+        return parseResponse(response);
     }
 
     /**
@@ -138,8 +158,24 @@ public class SpeechFlashRecognizerUtil {
                 .put("Content-type", "application/text")
                 .put("Host", HOST)
                 .build();
-        String response = HttpUtils.simplePost(URL, parameters, headers, null);
-        return JSON.parseObject(response);
+        ClassicHttpResponse response = HttpUtils.post(URL, parameters, headers, null);
+        return parseResponse(response);
+    }
+
+    /**
+     * 响应业务状态
+     *
+     * @author demiphea
+     * @since 17.0.9
+     */
+    private enum Status {
+        SUCCESS(20000000),
+        ;
+        public final int code;
+
+        Status(int code) {
+            this.code = code;
+        }
     }
 
     /**
