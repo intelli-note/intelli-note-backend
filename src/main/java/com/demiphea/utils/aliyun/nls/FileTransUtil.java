@@ -12,7 +12,7 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.demiphea.exception.utils.aliyun.ApiResponseCodeStatusException;
 import com.demiphea.exception.utils.aliyun.ApiServiceCodeStatusException;
 import com.demiphea.utils.aliyun.AliyunProfile;
-import com.demiphea.utils.aliyun.PopApiCenter;
+import com.demiphea.utils.aliyun.nls.api.Pop;
 import com.demiphea.utils.json.JsonObjectBuilder;
 import org.apache.hc.core5.http.HttpStatus;
 
@@ -30,10 +30,10 @@ import java.util.concurrent.TimeUnit;
  * @since 17.0.9
  */
 public class FileTransUtil {
-    private static final String product = PopApiCenter.NLS_FILETRANS.product;
-    private static final String regionId = PopApiCenter.NLS_FILETRANS.regionId;
-    private static final String endpointName = PopApiCenter.NLS_FILETRANS.endpointName;
-    private static final String domain = PopApiCenter.NLS_FILETRANS.domain;
+    private static final String product = Pop.NLS_FILETRANS.product;
+    private static final String regionId = Pop.NLS_FILETRANS.regionId;
+    private static final String endpointName = Pop.NLS_FILETRANS.endpointName;
+    private static final String domain = Pop.NLS_FILETRANS.domain;
 
     private static AliyunProfile aliyunProfile;
     private static String appKey;

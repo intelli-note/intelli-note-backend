@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.nls.client.AccessToken;
 import com.demiphea.exception.utils.aliyun.ApiResponseCodeStatusException;
 import com.demiphea.exception.utils.aliyun.ApiServiceCodeStatusException;
-import com.demiphea.utils.aliyun.ApiCenter;
+import com.demiphea.utils.aliyun.nls.api.Api;
 import com.demiphea.utils.network.HttpUtils;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
@@ -35,8 +35,8 @@ import java.util.Map;
  * @since 17.0.9
  */
 public class SpeechFlashRecognizerUtil {
-    private static final String URL = ApiCenter.NLS_SPEECH_FLASH_RECOGNIZER.URL;
-    private static final String HOST = ApiCenter.NLS_SPEECH_FLASH_RECOGNIZER.HOST;
+    private static final String URL = Api.NLS_SPEECH_FLASH_RECOGNIZER.URL;
+    private static final String HOST = Api.NLS_SPEECH_FLASH_RECOGNIZER.HOST;
     private static AccessToken accessToken;
     private static String appKey;
 

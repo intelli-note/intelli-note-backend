@@ -1,4 +1,4 @@
-package com.demiphea.utils.aliyun;
+package com.demiphea.utils.aliyun.nls.api;
 
 /**
  * ApiCenter
@@ -7,7 +7,7 @@ package com.demiphea.utils.aliyun;
  * @author demiphea
  * @since 17.0.9
  */
-public enum ApiCenter {
+public enum Api {
     NLS_SPEECH_FLASH_RECOGNIZER(
             "https://nls-gateway-cn-shanghai.aliyuncs.com/stream/v1/FlashRecognizer",
             "nls-gateway-cn-shanghai.aliyuncs.com"
@@ -16,7 +16,7 @@ public enum ApiCenter {
     public final String URL;
     public final String HOST;
 
-    ApiCenter(String URL, String HOST) {
+    Api(String URL, String HOST) {
         this.URL = URL;
         this.HOST = HOST;
     }
