@@ -1,4 +1,4 @@
-package com.demiphea.utils.aliyun;
+package com.demiphea.utils.aliyun.nls.api;
 
 /**
  * PopApiCenter
@@ -7,7 +7,7 @@ package com.demiphea.utils.aliyun;
  * @author demiphea
  * @since 17.0.9
  */
-public enum PopApiCenter {
+public enum Pop {
     NLS_FILETRANS(
             "nls-filetrans",
             "cn-shanghai",
@@ -20,7 +20,7 @@ public enum PopApiCenter {
     public final String endpointName;
     public final String domain;
 
-    PopApiCenter(String product, String regionId, String endpointName, String domain) {
+    Pop(String product, String regionId, String endpointName, String domain) {
         this.product = product;
         this.regionId = regionId;
         this.endpointName = endpointName;

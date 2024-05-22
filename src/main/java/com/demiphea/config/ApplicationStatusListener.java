@@ -1,10 +1,14 @@
 package com.demiphea.config;
 
 import com.alibaba.nls.client.AccessToken;
+import com.aliyun.ocr_api20210707.Client;
+import com.aliyun.teaopenapi.models.Config;
 import com.demiphea.utils.aliyun.AliyunProfile;
 import com.demiphea.utils.aliyun.nls.FileTransUtil;
 import com.demiphea.utils.aliyun.nls.NLSProfile;
 import com.demiphea.utils.aliyun.nls.SpeechFlashRecognizerUtil;
+import com.demiphea.utils.aliyun.ocr.RecognizeEduFormulaUtil;
+import com.demiphea.utils.aliyun.ocr.ServiceEndpoint;
 import com.demiphea.utils.network.HttpUtils;
 import com.demiphea.utils.oss.minio.MinioProfile;
 import com.demiphea.utils.oss.minio.MinioUtils;
@@ -42,17 +46,19 @@ public class ApplicationStatusListener {
     private final MinioProfile minioProfile;
 
     @PostConstruct
-    private void postApplicationStart() {
+    private void postApplicationStart() throws Exception {
         initOssUtils();
         initMinioUtils();
         initHttpUtils();
-        initAliyunUtils();
+        initAliyunNLSUtils();
+        initAliyunOCRUtils();
     }
 
     @PreDestroy
     private void preApplicationDestroy() throws Exception {
         destroyMinioUtils();
         destroyHttpUtils();
+
     }
 
     private void initOssUtils() {
@@ -108,7 +114,7 @@ public class ApplicationStatusListener {
         client.close();
     }
 
-    private void initAliyunUtils() {
+    private void initAliyunNLSUtils() {
         log.info("Init SpeechFlashRecognizerUtil...");
         Class<SpeechFlashRecognizerUtil> sfruClass = SpeechFlashRecognizerUtil.class;
         CommonReflectionUtils.setStaticFieldValue(sfruClass,
@@ -128,4 +134,17 @@ public class ApplicationStatusListener {
         );
     }
 
+    private void initAliyunOCRUtils() throws Exception {
+        log.info("Init AliyunOCRUtils");
+        Client client = new Client(new Config()
+                .setAccessKeyId(aliyunProfile.getAccessKey())
+                .setAccessKeySecret(aliyunProfile.getSecretKey())
+                .setEndpoint(ServiceEndpoint.OCR.endpoint)
+        );
+        log.info("Init RecognizeEduFormulaUtil...");
+        Class<RecognizeEduFormulaUtil> refuClass = RecognizeEduFormulaUtil.class;
+        CommonReflectionUtils.setStaticFieldValue(refuClass,
+                "client", client
+        );
+    }
 }
