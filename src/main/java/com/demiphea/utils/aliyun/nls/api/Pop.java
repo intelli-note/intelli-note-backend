@@ -1,7 +1,7 @@
 package com.demiphea.utils.aliyun.nls.api;
 
 /**
- * PopApiCenter
+ * Pop
  * 阿里云RPC POP API接口中心
  *
  * @author demiphea
