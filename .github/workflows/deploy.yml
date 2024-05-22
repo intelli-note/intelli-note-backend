@@ -38,6 +38,13 @@ jobs:
           OSS_SECRET_KEY: ${{ secrets.OSS_SECRET_KEY }}
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
           OSS_DOMAIN: ${{ secrets.OSS_DOMAIN }}
+          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          MINIO_BUCKET: ${{ secrets.MINIO_BUCKET }}
+          MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+          ALIYUN_ACCESS_KEY: ${{ secrets.ALIYUN_ACCESS_KEY }}
+          ALIYUN_SECRET_KEY: ${{ secrets.ALIYUN_SECRET_KEY }}
+          ALIYUN_NLS_APP_KEY: ${{ secrets.ALIYUN_NLS_APP_KEY }}
         uses: cross-the-world/ssh-scp-ssh-pipelines@v1.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -53,5 +60,5 @@ jobs:
           last_ssh: |
             cd ~/${{ env.PROJECT_NAME }}
             PID=$(ps -ef | grep ${{ env.PROJECT_NAME }}.jar | grep -v grep | head -n 1 | awk '{printf $2}'); if [ -n "$PID" ];then kill -9 $PID && echo -e '\033[1;31mThe original Spring Boot Application Process has terminated its execution!\033[0m'; else echo -e '\033[1;33mNo Spring Boot Application Process found!\033[0m'; fi;
-            nohup java -jar ${{ env.PROJECT_NAME }}.jar --spring.profiles.active=prd --spring.datasource.username=$MYSQL_USERNAME --spring.datasource.password=$MYSQL_PASSWORD --oss.access-key=$OSS_ACCESS_KEY --oss.secret-key=$OSS_SECRET_KEY --oss.bucket=$OSS_BUCKET --oss.domain=$OSS_DOMAIN > ${{ env.PROJECT_NAME }}.log 2>&1 &
+            nohup java -jar ${{ env.PROJECT_NAME }}.jar --spring.profiles.active=prd --spring.datasource.username=$MYSQL_USERNAME --spring.datasource.password=$MYSQL_PASSWORD --oss.access-key=$OSS_ACCESS_KEY --oss.secret-key=$OSS_SECRET_KEY --oss.bucket=$OSS_BUCKET --oss.domain=$OSS_DOMAIN --minio.access-key=$MINIO_ACCESS_KEY --minio.secret-key=$MINIO_SECRET_KEY --minio.endpoint=$MINIO_ENDPOINT --minio.bucket=$MINIO_BUCKET --aliyun.access-key=$ALIYUN_ACCESS_KEY --aliyun.secret-key=$ALIYUN_SECRET_KEY --aliyun.nls.app-key=$ALIYUN_NLS_APP_KEY > ${{ env.PROJECT_NAME }}.log 2>&1 &
             
