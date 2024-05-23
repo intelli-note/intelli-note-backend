@@ -1,6 +1,5 @@
 package com.demiphea.utils.jwt;
 
-import cn.hutool.core.util.RandomUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -24,8 +23,8 @@ public class JwtUtils {
     /**
      * 密钥
      */
-    private static final String SK = RandomUtil.randomString(RandomUtil.BASE_CHAR_NUMBER + "~!@#$%^&*()_+{}|<>?`[]\\;',./！￥……*（）——：“”《》？", 256);
-
+//    private static final String SK = RandomUtil.randomString(RandomUtil.BASE_CHAR_NUMBER + "~!@#$%^&*()_+{}|<>?`[]\\;',./！￥……*（）——：“”《》？", 256);
+    private static final String SK = "$4xSQkd.9G,+—e）d”t1@Lm”t…Wlv…l7：2>？9*<wJbTc`*$|'%*z9%F+_？$n（^)——O…）Y7》f[h？~<se—bC#av[Eof—>'FMe？5RI**<m`《dW（{'zG\\?rv：8m$—&0;*WbexTw8n：G（N^[？3>《3…i]”)^xH《1?zO5'{t*)AZ.x_Qi[sZ”&$qP`]Is+.9ehy`+$?WVV^@,￥…hy《1QxxP'/ar…N8ru90FpT*(V5NajmWxRqziH5d…{yp？￥!RI|—a6：r<]v";
     /**
      * 默认算法
      */

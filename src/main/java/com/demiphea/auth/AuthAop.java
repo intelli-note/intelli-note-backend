@@ -30,8 +30,11 @@ public class AuthAop {
     @Around("@annotation(com.demiphea.auth.Auth)")
     public Object doAuthentication(ProceedingJoinPoint method) throws Throwable {
         // 从请求头中解析出token
-        String jwt = request.getHeader("Authorization").trim();
-        Matcher matcher = Pattern.compile("^Bearer (?<token>.+)$").matcher(jwt);
+        String jwt = request.getHeader("Authorization");
+        if (jwt == null) {
+            throw new TokenParserException("请求头中未携带令牌");
+        }
+        Matcher matcher = Pattern.compile("^Bearer (?<token>.+)$").matcher(jwt.trim());
         if (!matcher.matches()) {
             throw new TokenParserException("认证失败！请求头错误");
         }
