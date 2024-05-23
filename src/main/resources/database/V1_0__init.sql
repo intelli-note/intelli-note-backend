@@ -1,6 +1,6 @@
--- 创建数据库
-drop database if exists intelli_note;
-create database if not exists intelli_note default character set utf8mb4 collate utf8mb4_unicode_ci;
+# -- 创建数据库
+# drop database if exists intelli_note;
+# create database if not exists intelli_note default character set utf8mb4 collate utf8mb4_unicode_ci;
 
 use intelli_note;
 
