@@ -15,6 +15,8 @@ import com.demiphea.utils.oss.minio.MinioUtils;
 import com.demiphea.utils.oss.qiniu.OssProfile;
 import com.demiphea.utils.oss.qiniu.OssUtils;
 import com.demiphea.utils.reflect.CommonReflectionUtils;
+import com.demiphea.utils.wechat.MiniProgramProfile;
+import com.demiphea.utils.wechat.MiniProgramUtils;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.util.Auth;
@@ -44,6 +46,7 @@ public class ApplicationStatusListener {
     private final AliyunProfile aliyunProfile;
     private final NLSProfile nlsProfile;
     private final MinioProfile minioProfile;
+    private final MiniProgramProfile miniProgramProfile;
 
     @PostConstruct
     private void postApplicationStart() throws Exception {
@@ -52,6 +55,7 @@ public class ApplicationStatusListener {
         initHttpUtils();
         initAliyunNLSUtils();
         initAliyunOCRUtils();
+        initMiniProgramUtils();
     }
 
     @PreDestroy
@@ -135,7 +139,7 @@ public class ApplicationStatusListener {
     }
 
     private void initAliyunOCRUtils() throws Exception {
-        log.info("Init AliyunOCRUtils");
+        log.info("Init AliyunOCRUtils...");
         Client client = new Client(new Config()
                 .setAccessKeyId(aliyunProfile.getAccessKey())
                 .setAccessKeySecret(aliyunProfile.getSecretKey())
@@ -145,6 +149,17 @@ public class ApplicationStatusListener {
         Class<RecognizeEduFormulaUtil> refuClass = RecognizeEduFormulaUtil.class;
         CommonReflectionUtils.setStaticFieldValue(refuClass,
                 "client", client
+        );
+    }
+
+    private void initMiniProgramUtils() {
+        log.info("Init MiniProgramUtils...");
+        Class<MiniProgramUtils> clazz = MiniProgramUtils.class;
+        CommonReflectionUtils.setStaticFieldValue(clazz,
+                "appId", miniProgramProfile.getAppId()
+        );
+        CommonReflectionUtils.setStaticFieldValue(clazz,
+                "appSecret", miniProgramProfile.getAppSecret()
         );
     }
 }

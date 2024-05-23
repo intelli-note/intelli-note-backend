@@ -49,3 +49,6 @@ aliyun:
   nls:
     app-key: "your nls project app-key"
 
+mini-program:
+  app-id: "your mini program's AppID"
+  app-secret: "your mini program's AppSecret"

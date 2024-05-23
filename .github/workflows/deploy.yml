@@ -45,6 +45,8 @@ jobs:
           ALIYUN_ACCESS_KEY: ${{ secrets.ALIYUN_ACCESS_KEY }}
           ALIYUN_SECRET_KEY: ${{ secrets.ALIYUN_SECRET_KEY }}
           ALIYUN_NLS_APP_KEY: ${{ secrets.ALIYUN_NLS_APP_KEY }}
+          MINI_PROGRAM_APP_ID: ${{ secrets.MINI_PROGRAM_APP_ID }}
+          MINI_PROGRAM_APP_SECRET: ${{ secrets.MINI_PROGRAM_APP_SECRET }}
         uses: cross-the-world/ssh-scp-ssh-pipelines@v1.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
