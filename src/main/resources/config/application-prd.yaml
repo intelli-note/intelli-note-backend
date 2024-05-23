@@ -5,6 +5,8 @@ spring:
     username: "your username"
     password: "your password"
     type: com.alibaba.druid.pool.DruidDataSource
+  flyway:
+    locations: classpath:database
 
 oss:
   access-key: "your access-key"
