@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author demiphea
  * @since 17.0.9
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class HttpUtilsTest {
     private static final String TEST_URL = "https://www.baidu.com";
 
