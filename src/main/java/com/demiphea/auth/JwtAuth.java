@@ -4,6 +4,8 @@ import cn.hutool.core.map.MapBuilder;
 import com.demiphea.entity.User;
 import com.demiphea.utils.jwt.JwtUtils;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * JwtAuth
  *
@@ -24,6 +26,16 @@ public class JwtAuth {
                         .put("id", user.getId())
                         .build()
         );
+    }
+
+    /**
+     * 获取有效时间
+     *
+     * @return {@link Long} 有效时间（s）
+     * @author demiphea
+     */
+    public static Long expires() {
+        return TimeUnit.SECONDS.convert(7, TimeUnit.DAYS);
     }
 
     /**
