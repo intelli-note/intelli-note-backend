@@ -4,6 +4,7 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author demiphea
  * @since 17.0.9
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest
+@ActiveProfiles("test")
 public class HttpUtilsTest {
     private static final String TEST_URL = "https://www.baidu.com";
 
