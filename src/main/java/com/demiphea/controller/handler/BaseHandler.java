@@ -3,6 +3,7 @@ package com.demiphea.controller.handler;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.demiphea.exception.auth.TokenParserException;
 import com.demiphea.model.api.ApiResponse;
+import jakarta.validation.ValidationException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +32,13 @@ public class BaseHandler {
     public ApiResponse handleAuthException(Exception e) {
         return ApiResponse.unauthorized(
                 packageExceptionMessage(e)
+        );
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ApiResponse handleValidationException(ValidationException e) {
+        return ApiResponse.fail(
+                e.getMessage()
         );
     }
 
