@@ -46,21 +46,16 @@ public class BaseServiceImpl implements BaseService {
     @Override
     public UserVo attachState(Long id, UserVo userVo) {
         UserState state = new UserState();
-        boolean self = id.equals(userVo.getId());
-        state.setSelfStatus(self);
-        UserState.FollowStatus followStatus = UserState.FollowStatus.FOLLOW_EACH_OTHER;
-        if (!self) {
-            boolean follow = followDao.exists(new LambdaQueryWrapper<Follow>()
-                    .eq(Follow::getFollowerId, id).eq(Follow::getFollowId, userVo.getId())
+        state.setSelfStatus(id.equals(userVo.getId()));
+        UserState.FollowStatus followStatus = UserState.FollowStatus.UNFOLLOWED;
+        boolean follow = followDao.exists(new LambdaQueryWrapper<Follow>()
+                .eq(Follow::getFollowerId, id).eq(Follow::getFollowId, userVo.getId())
+        );
+        if (follow) {
+            boolean followed = followDao.exists(new LambdaQueryWrapper<Follow>()
+                    .eq(Follow::getFollowerId, userVo.getId()).eq(Follow::getFollowId, id)
             );
-            if (!follow) {
-                followStatus = UserState.FollowStatus.UNFOLLOWED;
-            } else {
-                boolean followed = followDao.exists(new LambdaQueryWrapper<Follow>()
-                        .eq(Follow::getFollowerId, userVo.getId()).eq(Follow::getFollowId, id)
-                );
-                followStatus = followed ? UserState.FollowStatus.FOLLOW_EACH_OTHER : UserState.FollowStatus.FOLLOWED;
-            }
+            followStatus = !followed ? UserState.FollowStatus.FOLLOWED : UserState.FollowStatus.FOLLOW_EACH_OTHER;
         }
         state.setFollowStatus(followStatus);
 

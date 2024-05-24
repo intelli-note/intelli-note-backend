@@ -3,6 +3,8 @@ package com.demiphea.service;
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.UserVo;
 import org.apache.hc.core5.http.ParseException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,7 +24,7 @@ public interface UserService {
      * @return {@link Credential} 身份凭证信息
      * @author demiphea
      */
-    Credential licence(String code) throws URISyntaxException, IOException, ParseException;
+    Credential licence(@NotNull String code) throws URISyntaxException, IOException, ParseException;
 
     /**
      * 修改用户个人资料
@@ -35,5 +37,16 @@ public interface UserService {
      * @return {@link UserVo} 用户VO
      * @author demiphea
      */
-    UserVo updateUserProfile(Long id, String username, MultipartFile avatar, String biography, Integer gender) throws IOException;
+    UserVo updateUserProfile(@NotNull Long id, @Nullable String username, @Nullable MultipartFile avatar, @Nullable String biography, @Nullable Integer gender) throws IOException;
+
+
+    /**
+     * 根据ID查询用户
+     *
+     * @param id       当前用户ID，可以为null
+     * @param targetId 查询的用户ID
+     * @return {@link UserVo} 用户VO
+     * @author demiphea
+     */
+    UserVo getUserProfile(@Nullable Long id, @NotNull Long targetId);
 }
