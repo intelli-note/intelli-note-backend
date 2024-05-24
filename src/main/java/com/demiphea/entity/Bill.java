@@ -1,9 +1,6 @@
 package com.demiphea.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -54,7 +51,7 @@ public class Bill {
     private Long userId;
 
     /**
-     * 关联笔记ID
+     * 关联笔记ID，可以为空
      */
     @TableField("note_id")
     private Long noteId;
@@ -63,5 +60,6 @@ public class Bill {
      * 是否逻辑删除
      */
     @TableField("is_deleted")
+    @TableLogic
     private Boolean deleted;
 }

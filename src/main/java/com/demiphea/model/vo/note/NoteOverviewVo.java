@@ -1,7 +1,6 @@
 package com.demiphea.model.vo.note;
 
 import com.demiphea.model.vo.user.UserVo;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +17,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NoteOverviewVo {
     private Long id;
     private UserVo author;
