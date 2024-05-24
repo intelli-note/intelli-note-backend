@@ -6,11 +6,14 @@ import com.demiphea.auth.JwtAuth;
 import com.demiphea.common.Constant;
 import com.demiphea.dao.UserDao;
 import com.demiphea.entity.User;
+import com.demiphea.exception.user.BalanceDoesNotEnough;
 import com.demiphea.exception.user.Code2SessionException;
 import com.demiphea.exception.user.UserDoesNotExistException;
+import com.demiphea.model.po.user.WalletUpdate;
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.Licence;
 import com.demiphea.model.vo.user.UserVo;
+import com.demiphea.model.vo.user.Wallet;
 import com.demiphea.service.inf.BaseService;
 import com.demiphea.service.inf.user.UserService;
 import com.demiphea.utils.oss.qiniu.OssUtils;
@@ -97,5 +100,27 @@ public class UserServiceImpl implements UserService {
         return targetVO;
     }
 
+    @Override
+    public Wallet getUserWallet(@NotNull Long id) {
+        User user = userDao.selectById(id);
+        return new Wallet(user.getBalance(), user.getRevenue());
+    }
 
+    @Override
+    public Wallet updateUserWallet(@NotNull Long id, @NotNull WalletUpdate update) {
+        User user = userDao.selectById(id);
+        WalletUpdate.Operate type = update.getType();
+        BigDecimal delta = update.getAmount();
+        switch (type) {
+            case IN -> user.setBalance(user.getBalance().add(delta));
+            case OUT -> {
+                if (user.getBalance().compareTo(delta) < 0) {
+                    throw new BalanceDoesNotEnough("用户余额不足");
+                }
+                user.setBalance(user.getBalance().subtract(delta));
+            }
+        }
+        userDao.updateById(user);
+        return new Wallet(user.getBalance(), user.getRevenue());
+    }
 }
