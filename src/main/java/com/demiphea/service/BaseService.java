@@ -31,8 +31,10 @@ public interface BaseService {
     /**
      * 附加状态量
      *
-     * @param id     当前用户ID
+     * @param id 当前用户ID
      * @param userVo 用户VO
+     * @return {@link UserVo} 用户VO
+     * @author demiphea
      */
-    void attachState(Long id, UserVo userVo);
+    UserVo attachState(Long id, UserVo userVo);
 }

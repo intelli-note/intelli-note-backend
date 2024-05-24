@@ -1,16 +1,19 @@
 package com.demiphea.controller;
 
+import com.demiphea.auth.Auth;
+import com.demiphea.auth.AuthID;
 import com.demiphea.model.api.ApiResponse;
 import com.demiphea.model.vo.user.Credential;
+import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.service.UserService;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -37,4 +40,27 @@ public class UserController {
         Credential credential = userService.licence(code);
         return ApiResponse.success(credential);
     }
+
+    @PostMapping
+    @Auth
+    public ApiResponse updateUserProfile(
+            @AuthID
+            Long id,
+            @RequestParam(required = false)
+            @Length(min = 1, max = 20, message = "用户名长度为1~20个字符")
+            String username,
+            @RequestParam(required = false)
+            MultipartFile avatar,
+            @RequestParam(required = false)
+            @Length(max = 250, message = "个人简介长度为0~250个字符")
+            String biography,
+            @RequestParam(required = false)
+            @Range(min = 0, max = 2, message = "性别枚举值: 0(未知), 1(男), 2(女)")
+            Integer gender
+    ) throws IOException {
+        UserVo userVo = userService.updateUserProfile(id, username, avatar, biography, gender);
+        return ApiResponse.success(userVo);
+    }
+
+
 }

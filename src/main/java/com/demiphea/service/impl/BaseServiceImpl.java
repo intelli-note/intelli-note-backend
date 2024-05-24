@@ -44,7 +44,7 @@ public class BaseServiceImpl implements BaseService {
     }
 
     @Override
-    public void attachState(Long id, UserVo userVo) {
+    public UserVo attachState(Long id, UserVo userVo) {
         UserState state = new UserState();
         boolean self = id.equals(userVo.getId());
         state.setSelfStatus(self);
@@ -63,5 +63,8 @@ public class BaseServiceImpl implements BaseService {
             }
         }
         state.setFollowStatus(followStatus);
+
+        userVo.setState(state);
+        return userVo;
     }
 }

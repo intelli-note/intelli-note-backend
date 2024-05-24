@@ -9,12 +9,15 @@ import com.demiphea.entity.User;
 import com.demiphea.exception.user.Code2SessionException;
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.Licence;
+import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.service.BaseService;
 import com.demiphea.service.UserService;
+import com.demiphea.utils.oss.qiniu.OssUtils;
 import com.demiphea.utils.wechat.MiniProgramUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -51,5 +54,30 @@ public class UserServiceImpl implements UserService {
                         JwtAuth.expires().intValue()
                 )
         );
+    }
+
+    @Override
+    public UserVo updateUserProfile(Long id, String username, MultipartFile avatar, String biography, Integer gender) throws IOException {
+        User user = userDao.selectById(id);
+        if (username != null) {
+            user.setUsername(username);
+        }
+        if (avatar != null) {
+            String avatarUrl = OssUtils.upload(Constant.avatarDir, null, avatar);
+            user.setAvatar(avatarUrl);
+        }
+        if (biography != null) {
+            user.setBiography(biography);
+        }
+        if (gender != null) {
+            user.setGender(switch (gender) {
+                case 0 -> null;
+                case 1 -> true;
+                case 2 -> false;
+                default -> throw new IllegalStateException("Unexpected value: " + gender);
+            });
+        }
+        userDao.updateById(user);
+        return baseService.convert(user);
     }
 }
