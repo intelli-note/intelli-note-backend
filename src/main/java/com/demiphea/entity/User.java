@@ -1,9 +1,6 @@
 package com.demiphea.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,7 +46,7 @@ public class User {
     /**
      * 性别：null-未知，true-男生，false-女生
      */
-    @TableField("gender")
+    @TableField(value = "gender", updateStrategy = FieldStrategy.ALWAYS)
     private Boolean gender;
 
     /**
