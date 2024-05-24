@@ -1,16 +1,20 @@
 package com.demiphea.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.demiphea.dao.FollowDao;
-import com.demiphea.dao.UserDao;
-import com.demiphea.entity.Follow;
-import com.demiphea.entity.User;
+import com.demiphea.dao.*;
+import com.demiphea.entity.*;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.vo.note.NoteConfiguration;
+import com.demiphea.model.vo.note.NoteOverviewState;
+import com.demiphea.model.vo.note.NoteOverviewVo;
+import com.demiphea.model.vo.user.BillVo;
 import com.demiphea.model.vo.user.UserState;
 import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.service.inf.BaseService;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,17 +28,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class BaseServiceImpl implements BaseService {
-    private final UserDao userDao;
     private final FollowDao followDao;
+    private final UserDao userDao;
+    private final ViewHistoryDao viewHistoryDao;
+    private final NoteFavoriteDao noteFavoriteDao;
+    private final CommentDao commentDao;
+    private final FavoriteDao favoriteDao;
+    private final NoteDao noteDao;
 
     @Override
-    public UserVo convert(Long id) {
-        User user = userDao.selectById(id);
-        return convert(user);
-    }
-
-    @Override
-    public UserVo convert(User user) {
+    public UserVo convert(@NotNull User user) {
         UserVo userVo = new UserVo();
         userVo.setId(user.getId());
         userVo.setUsername(user.getUsername());
@@ -48,7 +51,7 @@ public class BaseServiceImpl implements BaseService {
     }
 
     @Override
-    public UserVo attachState(Long id, UserVo userVo) {
+    public UserVo attachState(@NotNull Long id, @NotNull UserVo userVo) {
         UserState state = new UserState();
         state.setSelfStatus(id.equals(userVo.getId()));
         UserState.FollowStatus followStatus = UserState.FollowStatus.UNFOLLOWED;
@@ -68,7 +71,59 @@ public class BaseServiceImpl implements BaseService {
     }
 
     @Override
-    public PageResult convert(PageInfo<?> pageInfo, List<?> list) {
+    public NoteOverviewVo convert(@Nullable Long id, @NotNull Note note) {
+        NoteOverviewVo noteOverviewVo = new NoteOverviewVo();
+        noteOverviewVo.setId(note.getId());
+        UserVo author = convert(userDao.selectById(note.getUserId()));
+        if (id != null) {
+            attachState(id, author);
+        }
+        noteOverviewVo.setAuthor(author);
+        noteOverviewVo.setTitle(note.getTitle());
+        noteOverviewVo.setCover(note.getCover());
+        Long viewNum = viewHistoryDao.selectCount(new LambdaQueryWrapper<ViewHistory>().eq(ViewHistory::getNoteId, note.getId()));
+        noteOverviewVo.setViewNum(viewNum.toString());
+        Long starNum = noteFavoriteDao.selectCount(new LambdaQueryWrapper<NoteFavorite>().eq(NoteFavorite::getNoteId, note.getId()));
+        noteOverviewVo.setStarNum(starNum.toString());
+        Long commentNum = commentDao.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getNoteId, note.getId()));
+        noteOverviewVo.setCommentNum(commentNum.toString());
+        noteOverviewVo.setCreateTime(note.getCreateTime());
+        noteOverviewVo.setUpdateTime(note.getUpdateTime());
+        if (id != null) {
+            boolean owner = id.equals(note.getUserId());
+            noteOverviewVo.setState(new NoteOverviewState(
+                    noteFavoriteDao.selectList(new LambdaQueryWrapper<NoteFavorite>().eq(NoteFavorite::getNoteId, note.getId())).stream()
+                            .map(NoteFavorite::getFavoriteId)
+                            .map(favoriteDao::selectById)
+                            .map(Favorite::getUserId)
+                            .distinct()
+                            .anyMatch(x -> x.equals(id)),
+                    owner
+            ));
+            if (owner) {
+                noteOverviewVo.setConfiguration(new NoteConfiguration(
+                        note.getOpenPublic(),
+                        note.getPrice()
+                ));
+            }
+        }
+        return noteOverviewVo;
+    }
+
+    @Override
+    public BillVo convert(@Nullable Long id, @NotNull Bill bill) {
+        BillVo billVo = new BillVo();
+        billVo.setId(bill.getId());
+        billVo.setType(bill.getType());
+        billVo.setAmount(bill.getAmount());
+        Note note = noteDao.selectById(bill.getNoteId());
+        billVo.setNote(convert(id, note));
+        billVo.setCreateTime(bill.getCreateTime());
+        return billVo;
+    }
+
+    @Override
+    public PageResult convert(@NotNull PageInfo<?> pageInfo, @NotNull List<?> list) {
         PageResult result = new PageResult();
         result.setPages(pageInfo.getPages());
         result.setPageNum(pageInfo.getPageNum());
