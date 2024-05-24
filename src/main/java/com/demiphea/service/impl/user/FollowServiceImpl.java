@@ -8,6 +8,7 @@ import com.demiphea.model.api.PageResult;
 import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.service.inf.BaseService;
 import com.demiphea.service.inf.user.FollowService;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class FollowServiceImpl implements FollowService {
 
     @Override
     public PageResult listFollows(@NotNull Long id, @NotNull Integer pageNum, @NotNull Integer pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        Page<Object> page = PageHelper.startPage(pageNum, pageSize);
         List<Follow> follows = followDao.selectList(new LambdaQueryWrapper<Follow>().eq(Follow::getFollowerId, id));
         PageInfo<Follow> pageInfo = new PageInfo<>(follows);
         List<UserVo> list = follows.stream()
@@ -56,12 +57,14 @@ public class FollowServiceImpl implements FollowService {
                 .map(baseService::convert)
                 .map(vo -> baseService.attachState(id, vo))
                 .toList();
-        return baseService.convert(pageInfo, list);
+        PageResult result = baseService.convert(pageInfo, list);
+        page.close();
+        return result;
     }
 
     @Override
     public PageResult listFollowers(@NotNull Long id, @NotNull Integer pageNum, @NotNull Integer pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        Page<Object> page = PageHelper.startPage(pageNum, pageSize);
         List<Follow> followers = followDao.selectList(new LambdaQueryWrapper<Follow>().eq(Follow::getFollowId, id));
         PageInfo<Follow> pageInfo = new PageInfo<>(followers);
         List<UserVo> list = followers.stream()
@@ -70,6 +73,8 @@ public class FollowServiceImpl implements FollowService {
                 .map(baseService::convert)
                 .map(vo -> baseService.attachState(id, vo))
                 .toList();
-        return baseService.convert(pageInfo, list);
+        PageResult result = baseService.convert(pageInfo, list);
+        page.close();
+        return result;
     }
 }

@@ -1,9 +1,15 @@
 package com.demiphea.service.inf;
 
+import com.demiphea.entity.Bill;
+import com.demiphea.entity.Note;
 import com.demiphea.entity.User;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.vo.note.NoteOverviewVo;
+import com.demiphea.model.vo.user.BillVo;
 import com.demiphea.model.vo.user.UserVo;
 import com.github.pagehelper.PageInfo;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -17,21 +23,11 @@ public interface BaseService {
     /**
      * 用户转换
      *
-     * @param id 用户ID
-     * @return {@link UserVo} 用户VO
-     * @author demiphea
-     */
-    @Deprecated
-    UserVo convert(Long id);
-
-    /**
-     * 用户转换
-     *
      * @param user 用户实体类
      * @return {@link UserVo} 用户VO
      * @author demiphea
      */
-    UserVo convert(User user);
+    UserVo convert(@NotNull User user);
 
     /**
      * 附加状态量
@@ -41,7 +37,27 @@ public interface BaseService {
      * @return {@link UserVo} 用户VO
      * @author demiphea
      */
-    UserVo attachState(Long id, UserVo userVo);
+    UserVo attachState(@NotNull Long id, @NotNull UserVo userVo);
+
+    /**
+     * 笔记转换
+     *
+     * @param id   当前用户ID
+     * @param note 笔记
+     * @return {@link NoteOverviewVo} 笔记概览VO
+     * @author demiphea
+     */
+    NoteOverviewVo convert(@Nullable Long id, @NotNull Note note);
+
+    /**
+     * 账单转换
+     *
+     * @param id   当前用户ID
+     * @param bill 账单
+     * @return {@link BillVo} 账单VO
+     * @author demiphea
+     */
+    BillVo convert(@Nullable Long id, @NotNull Bill bill);
 
     /**
      * 分页结果转换
@@ -51,5 +67,5 @@ public interface BaseService {
      * @return {@link PageResult}
      * @author demiphea
      */
-    PageResult convert(PageInfo<?> pageInfo, List<?> list);
+    PageResult convert(@NotNull PageInfo<?> pageInfo, @NotNull List<?> list);
 }
