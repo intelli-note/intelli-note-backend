@@ -1,7 +1,11 @@
-package com.demiphea.service;
+package com.demiphea.service.inf;
 
 import com.demiphea.entity.User;
+import com.demiphea.model.api.PageResult;
 import com.demiphea.model.vo.user.UserVo;
+import com.github.pagehelper.PageInfo;
+
+import java.util.List;
 
 /**
  * BaseService
@@ -17,6 +21,7 @@ public interface BaseService {
      * @return {@link UserVo} 用户VO
      * @author demiphea
      */
+    @Deprecated
     UserVo convert(Long id);
 
     /**
@@ -37,4 +42,14 @@ public interface BaseService {
      * @author demiphea
      */
     UserVo attachState(Long id, UserVo userVo);
+
+    /**
+     * 分页结果转换
+     *
+     * @param pageInfo 分页容器
+     * @param list     列表
+     * @return {@link PageResult}
+     * @author demiphea
+     */
+    PageResult convert(PageInfo<?> pageInfo, List<?> list);
 }

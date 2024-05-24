@@ -1,4 +1,4 @@
-package com.demiphea.service;
+package com.demiphea.service.inf.user;
 
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.UserVo;

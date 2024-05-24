@@ -1,4 +1,4 @@
-package com.demiphea.service.impl;
+package com.demiphea.service.impl.user;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -11,8 +11,8 @@ import com.demiphea.exception.user.UserDoesNotExistException;
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.Licence;
 import com.demiphea.model.vo.user.UserVo;
-import com.demiphea.service.BaseService;
-import com.demiphea.service.UserService;
+import com.demiphea.service.inf.BaseService;
+import com.demiphea.service.inf.user.UserService;
 import com.demiphea.utils.oss.qiniu.OssUtils;
 import com.demiphea.utils.wechat.MiniProgramUtils;
 import lombok.RequiredArgsConstructor;
