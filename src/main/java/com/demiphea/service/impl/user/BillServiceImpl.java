@@ -3,6 +3,7 @@ package com.demiphea.service.impl.user;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.demiphea.dao.BillDao;
 import com.demiphea.entity.Bill;
+import com.demiphea.exception.common.PermissionDeniedException;
 import com.demiphea.model.api.PageResult;
 import com.demiphea.model.vo.user.BillVo;
 import com.demiphea.service.inf.BaseService;
@@ -29,6 +30,16 @@ public class BillServiceImpl implements BillService {
     private final BillDao billDao;
 
     @Override
+    public Boolean checkPermission(Long userId, Long billId) {
+        return checkPermission(userId, billDao.selectById(billId));
+    }
+
+    @Override
+    public Boolean checkPermission(Long userId, Bill bill) {
+        return userId.equals(bill.getUserId());
+    }
+
+    @Override
     public PageResult listBills(@NotNull Long id, @NotNull Integer pageNum, @NotNull Integer pageSize) {
         Page<Object> page = PageHelper.startPage(pageNum, pageSize);
         List<Bill> bills = billDao.selectList(new LambdaQueryWrapper<Bill>().eq(Bill::getUserId, id));
@@ -37,5 +48,13 @@ public class BillServiceImpl implements BillService {
         PageResult result = baseService.convert(pageInfo, list);
         page.close();
         return result;
+    }
+
+    @Override
+    public void deleteBill(@NotNull Long id, @NotNull Long billId) {
+        if (!checkPermission(id, billId)) {
+            throw new PermissionDeniedException("用户无权限操作此账单");
+        }
+        billDao.deleteById(billId);
     }
 }
