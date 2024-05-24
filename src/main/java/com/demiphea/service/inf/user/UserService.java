@@ -1,7 +1,9 @@
 package com.demiphea.service.inf.user;
 
+import com.demiphea.model.po.user.WalletUpdate;
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.UserVo;
+import com.demiphea.model.vo.user.Wallet;
 import org.apache.hc.core5.http.ParseException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,4 +51,23 @@ public interface UserService {
      * @author demiphea
      */
     UserVo getUserProfile(@Nullable Long id, @NotNull Long targetId);
+
+    /**
+     * 获取用户钱包
+     *
+     * @param id 当前用户ID
+     * @return {@link Wallet} 钱包信息
+     * @author demiphea
+     */
+    Wallet getUserWallet(@NotNull Long id);
+
+    /**
+     * 更新用户钱包
+     *
+     * @param id     当前用户ID
+     * @param update 更新数据
+     * @return {@link Wallet} 钱包信息
+     * @author demiphea
+     */
+    Wallet updateUserWallet(@NotNull Long id, @NotNull WalletUpdate update);
 }
