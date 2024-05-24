@@ -7,6 +7,7 @@ import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.service.UserService;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.hibernate.validator.constraints.Length;
@@ -60,6 +61,19 @@ public class UserController {
     ) throws IOException {
         UserVo userVo = userService.updateUserProfile(id, username, avatar, biography, gender);
         return ApiResponse.success(userVo);
+    }
+
+    @Auth(block = false)
+    @GetMapping("/{targetId}")
+    public ApiResponse getUserProfile(
+            @AuthID
+            Long id,
+            @PathVariable
+            @NotNull
+            Long targetId
+    ) {
+        UserVo targetVo = userService.getUserProfile(id, targetId);
+        return ApiResponse.success(targetVo);
     }
 
 

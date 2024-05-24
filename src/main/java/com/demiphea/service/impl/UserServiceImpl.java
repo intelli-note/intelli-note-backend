@@ -7,6 +7,7 @@ import com.demiphea.common.Constant;
 import com.demiphea.dao.UserDao;
 import com.demiphea.entity.User;
 import com.demiphea.exception.user.Code2SessionException;
+import com.demiphea.exception.user.UserDoesNotExistException;
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.Licence;
 import com.demiphea.model.vo.user.UserVo;
@@ -16,6 +17,8 @@ import com.demiphea.utils.oss.qiniu.OssUtils;
 import com.demiphea.utils.wechat.MiniProgramUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +39,7 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
 
     @Override
-    public Credential licence(String code) throws URISyntaxException, IOException, ParseException {
+    public Credential licence(@NotNull String code) throws URISyntaxException, IOException, ParseException {
         JSONObject result = MiniProgramUtils.login(code);
         String openId = result.getString("openid");
         if (openId == null) {
@@ -57,7 +60,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserVo updateUserProfile(Long id, String username, MultipartFile avatar, String biography, Integer gender) throws IOException {
+    public UserVo updateUserProfile(@NotNull Long id, @Nullable String username, @Nullable MultipartFile avatar, @Nullable String biography, @Nullable Integer gender) throws IOException {
         User user = userDao.selectById(id);
         if (username != null) {
             user.setUsername(username);
@@ -80,4 +83,19 @@ public class UserServiceImpl implements UserService {
         userDao.updateById(user);
         return baseService.convert(user);
     }
+
+    @Override
+    public UserVo getUserProfile(@Nullable Long id, @NotNull Long targetId) {
+        User target = userDao.selectById(targetId);
+        if (target == null) {
+            throw new UserDoesNotExistException("用户不存在");
+        }
+        UserVo targetVO = baseService.convert(target);
+        if (id != null) {
+            baseService.attachState(id, targetVO);
+        }
+        return targetVO;
+    }
+
+
 }
