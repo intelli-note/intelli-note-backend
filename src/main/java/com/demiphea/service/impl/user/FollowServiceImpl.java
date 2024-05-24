@@ -49,7 +49,7 @@ public class FollowServiceImpl implements FollowService {
     @Override
     public PageResult listFollows(@NotNull Long id, @NotNull Integer pageNum, @NotNull Integer pageSize) {
         Page<Object> page = PageHelper.startPage(pageNum, pageSize);
-        List<Follow> follows = followDao.selectList(new LambdaQueryWrapper<Follow>().eq(Follow::getFollowerId, id));
+        List<Follow> follows = followDao.selectList(new LambdaQueryWrapper<Follow>().eq(Follow::getFollowerId, id).orderByDesc(Follow::getCreateTime));
         PageInfo<Follow> pageInfo = new PageInfo<>(follows);
         List<UserVo> list = follows.stream()
                 .map(Follow::getFollowId)
@@ -65,7 +65,7 @@ public class FollowServiceImpl implements FollowService {
     @Override
     public PageResult listFollowers(@NotNull Long id, @NotNull Integer pageNum, @NotNull Integer pageSize) {
         Page<Object> page = PageHelper.startPage(pageNum, pageSize);
-        List<Follow> followers = followDao.selectList(new LambdaQueryWrapper<Follow>().eq(Follow::getFollowId, id));
+        List<Follow> followers = followDao.selectList(new LambdaQueryWrapper<Follow>().eq(Follow::getFollowId, id).orderByDesc(Follow::getCreateTime));
         PageInfo<Follow> pageInfo = new PageInfo<>(followers);
         List<UserVo> list = followers.stream()
                 .map(Follow::getFollowerId)

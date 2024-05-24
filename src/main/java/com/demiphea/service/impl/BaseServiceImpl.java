@@ -116,8 +116,10 @@ public class BaseServiceImpl implements BaseService {
         billVo.setId(bill.getId());
         billVo.setType(bill.getType());
         billVo.setAmount(bill.getAmount());
-        Note note = noteDao.selectById(bill.getNoteId());
-        billVo.setNote(convert(id, note));
+        if (bill.getNoteId() != null) {
+            Note note = noteDao.selectById(bill.getNoteId());
+            billVo.setNote(convert(id, note));
+        }
         billVo.setCreateTime(bill.getCreateTime());
         return billVo;
     }
