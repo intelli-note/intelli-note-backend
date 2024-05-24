@@ -13,4 +13,8 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Auth {
+    /**
+     * 是否拦截返回401
+     */
+    boolean block() default true;
 }

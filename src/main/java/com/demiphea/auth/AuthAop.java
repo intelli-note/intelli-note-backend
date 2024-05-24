@@ -27,24 +27,42 @@ import java.util.regex.Pattern;
 public class AuthAop {
     private final HttpServletRequest request;
 
-    @Around("@annotation(com.demiphea.auth.Auth)")
-    public Object doAuthentication(ProceedingJoinPoint method) throws Throwable {
+    @Around("@annotation(auth)")
+    public Object doAuthentication(ProceedingJoinPoint method, Auth auth) throws Throwable {
+        boolean block = auth.block();
+        Object[] args = method.getArgs();
         // 从请求头中解析出token
         String jwt = request.getHeader("Authorization");
         if (jwt == null) {
-            throw new TokenParserException("请求头中未携带令牌");
+            if (block) {
+                throw new TokenParserException("请求头中未携带令牌");
+            } else {
+                return method.proceed(args);
+            }
         }
         Matcher matcher = Pattern.compile("^Bearer (?<token>.+)$").matcher(jwt.trim());
         if (!matcher.matches()) {
-            throw new TokenParserException("认证失败！请求头错误");
+            if (block) {
+                throw new TokenParserException("认证失败！请求头错误");
+            } else {
+                return method.proceed(args);
+            }
         }
         String token = matcher.group("token");
         // token校验
-        Long id = JwtAuth.verify(token);
+        Long id;
+        try {
+            id = JwtAuth.verify(token);
+        } catch (Exception e) {
+            if (block) {
+                throw e;
+            } else {
+                return method.proceed(args);
+            }
+        }
         // 注入ID
         Method invokeMethod = ((MethodSignature) method.getSignature()).getMethod();
 
-        Object[] args = method.getArgs();
         Class<?>[] parameterTypes = invokeMethod.getParameterTypes();
         Annotation[][] parameterAnnotations = invokeMethod.getParameterAnnotations();
         for (int i = 0; i < parameterAnnotations.length; i++) {
