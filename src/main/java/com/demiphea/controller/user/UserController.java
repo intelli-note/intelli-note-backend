@@ -1,11 +1,11 @@
-package com.demiphea.controller;
+package com.demiphea.controller.user;
 
 import com.demiphea.auth.Auth;
 import com.demiphea.auth.AuthID;
 import com.demiphea.model.api.ApiResponse;
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.UserVo;
-import com.demiphea.service.UserService;
+import com.demiphea.service.inf.user.UserService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;

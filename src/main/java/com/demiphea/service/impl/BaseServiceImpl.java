@@ -5,11 +5,15 @@ import com.demiphea.dao.FollowDao;
 import com.demiphea.dao.UserDao;
 import com.demiphea.entity.Follow;
 import com.demiphea.entity.User;
+import com.demiphea.model.api.PageResult;
 import com.demiphea.model.vo.user.UserState;
 import com.demiphea.model.vo.user.UserVo;
-import com.demiphea.service.BaseService;
+import com.demiphea.service.inf.BaseService;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * BaseServiceImpl
@@ -61,5 +65,23 @@ public class BaseServiceImpl implements BaseService {
 
         userVo.setState(state);
         return userVo;
+    }
+
+    @Override
+    public PageResult convert(PageInfo<?> pageInfo, List<?> list) {
+        PageResult result = new PageResult();
+        result.setPages(pageInfo.getPages());
+        result.setPageNum(pageInfo.getPageNum());
+        result.setPageSize(pageInfo.getPageSize());
+        result.setTotal(pageInfo.getTotal());
+        result.setList(list);
+        result.setSize(pageInfo.getSize());
+        result.setHasPreviousPage(pageInfo.isHasPreviousPage());
+        result.setHasNextPage(pageInfo.isHasNextPage());
+        result.setFirstPage(pageInfo.isIsFirstPage());
+        result.setLastPage(pageInfo.isIsLastPage());
+        result.setFirstPageNum(pageInfo.getNavigateFirstPage());
+        result.setLastPageNum(pageInfo.getNavigateLastPage());
+        return result;
     }
 }
