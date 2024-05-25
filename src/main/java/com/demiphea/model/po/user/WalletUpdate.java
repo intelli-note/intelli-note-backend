@@ -24,7 +24,7 @@ public class WalletUpdate {
     private Operate type;
     @NotNull(message = "需要传入操作金额")
     @Digits(integer = 10, fraction = 2, message = "金额格式不正确，需要保留两位小数")
-    @DecimalMin(value = "0", message = "金额必须大于0.00")
+    @DecimalMin(value = "0", message = "金额必须大于或等于0.00")
     private BigDecimal amount;
 
     public enum Operate {
