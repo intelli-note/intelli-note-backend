@@ -4,6 +4,7 @@ import com.demiphea.common.Constant;
 import com.demiphea.dao.NoteDao;
 import com.demiphea.entity.Note;
 import com.demiphea.exception.common.ObjectDoesNotExistException;
+import com.demiphea.exception.common.PermissionDeniedException;
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.service.inf.BaseService;
 import com.demiphea.service.inf.note.NoteService;
@@ -58,7 +59,9 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public NoteOverviewVo updateNote(@NotNull Long id, @NotNull Long noteId, @Nullable String title, @Nullable MultipartFile cover, @Nullable String content, @Nullable Boolean openPublic, @Nullable BigDecimal price) throws IOException {
         Note note = noteDao.selectById(noteId);
-        checkAdminPermission(id, note);
+        if (!checkAdminPermission(id, note)) {
+            throw new PermissionDeniedException("权限拒绝访问操作");
+        }
         note.setTitle(title);
         if (cover != null) {
             String coverUrl = OssUtils.upload(Constant.NOTE_COVER_DIR, null, cover);
@@ -70,5 +73,13 @@ public class NoteServiceImpl implements NoteService {
         note.setUpdateTime(LocalDateTime.now());
         noteDao.updateById(note);
         return baseService.convert(id, noteDao.selectById(noteId));
+    }
+
+    @Override
+    public void deleteNote(@NotNull Long id, @NotNull Long noteId) {
+        if (!checkAdminPermission(id, noteId)) {
+            throw new PermissionDeniedException("权限拒绝访问操作");
+        }
+        noteDao.deleteById(noteId);
     }
 }

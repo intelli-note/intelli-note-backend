@@ -64,4 +64,13 @@ public interface NoteService {
      * @author demiphea
      */
     NoteOverviewVo updateNote(@NotNull Long id, @NotNull Long noteId, @Nullable String title, @Nullable MultipartFile cover, @Nullable String content, @Nullable Boolean openPublic, @Nullable BigDecimal price) throws IOException;
+
+    /**
+     * 删除笔记
+     *
+     * @param id     当前用户ID
+     * @param noteId 笔记ID
+     * @author demiphea
+     */
+    void deleteNote(@NotNull Long id, @NotNull Long noteId);
 }
