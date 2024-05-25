@@ -79,4 +79,14 @@ public class NoteController {
         NoteOverviewVo noteOverviewVo = noteService.updateNote(id, noteId, title, cover, content, publicOption, freeOption);
         return ApiResponse.success(noteOverviewVo);
     }
+
+    @DeleteMapping("/{noteId}")
+    @Auth
+    public ApiResponse deleteNote(
+            @AuthID Long id,
+            @PathVariable Long noteId
+    ) {
+        noteService.deleteNote(id, noteId);
+        return ApiResponse.success();
+    }
 }
