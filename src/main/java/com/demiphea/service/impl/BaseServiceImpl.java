@@ -90,7 +90,6 @@ public class BaseServiceImpl implements BaseService {
         noteOverviewVo.setCreateTime(note.getCreateTime());
         noteOverviewVo.setUpdateTime(note.getUpdateTime());
         if (id != null) {
-            boolean owner = id.equals(note.getUserId());
             noteOverviewVo.setState(new NoteOverviewState(
                     noteFavoriteDao.selectList(new LambdaQueryWrapper<NoteFavorite>().eq(NoteFavorite::getNoteId, note.getId())).stream()
                             .map(NoteFavorite::getFavoriteId)
@@ -98,15 +97,13 @@ public class BaseServiceImpl implements BaseService {
                             .map(Favorite::getUserId)
                             .distinct()
                             .anyMatch(x -> x.equals(id)),
-                    owner
+                    id.equals(note.getUserId())
             ));
-            if (owner) {
-                noteOverviewVo.setConfiguration(new NoteConfiguration(
-                        note.getOpenPublic(),
-                        note.getPrice()
-                ));
-            }
         }
+        noteOverviewVo.setConfiguration(new NoteConfiguration(
+                note.getOpenPublic(),
+                note.getPrice()
+        ));
         return noteOverviewVo;
     }
 
