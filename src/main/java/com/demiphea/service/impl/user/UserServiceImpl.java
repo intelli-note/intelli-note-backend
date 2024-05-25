@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
             user.setUsername(username);
         }
         if (avatar != null) {
-            String avatarUrl = OssUtils.upload(Constant.avatarDir, null, avatar);
+            String avatarUrl = OssUtils.upload(Constant.AVATAR_DIR, null, avatar);
             user.setAvatar(avatarUrl);
         }
         if (biography != null) {
