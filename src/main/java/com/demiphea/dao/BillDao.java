@@ -9,5 +9,13 @@ import com.demiphea.entity.Bill;
  * @since 17.0.9
  */
 public interface BillDao extends BaseMapper<Bill> {
-
+    /**
+     * 判断是否用户是否购买笔记
+     *
+     * @param userId 用户ID
+     * @param noteId 笔记ID
+     * @return 是否购买
+     * @author demiphea
+     */
+    boolean hasBuy(Long userId, Long noteId);
 }

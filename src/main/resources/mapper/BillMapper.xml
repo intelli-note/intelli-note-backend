@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demiphea.dao.BillDao">
+    <resultMap id="bill" type="com.demiphea.entity.Bill">
+        <id property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="amount" column="amount"/>
+        <result property="createTime" column="create_time"/>
+        <result property="userId" column="user_id"/>
+        <result property="noteId" column="noteId"/>
+        <result property="deleted" column="is_deleted"/>
+    </resultMap>
+
+    <select id="hasBuy" resultType="java.lang.Boolean">
+        SELECT EXISTS(SELECT * FROM bill WHERE user_id = #{userId} AND note_id = #{noteId} AND type = 1);
+    </select>
+</mapper>
