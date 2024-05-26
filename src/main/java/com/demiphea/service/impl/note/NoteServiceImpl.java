@@ -1,11 +1,15 @@
 package com.demiphea.service.impl.note;
 
 import com.demiphea.common.Constant;
+import com.demiphea.dao.BillDao;
 import com.demiphea.dao.NoteDao;
+import com.demiphea.dao.ViewHistoryDao;
 import com.demiphea.entity.Note;
+import com.demiphea.entity.ViewHistory;
 import com.demiphea.exception.common.ObjectDoesNotExistException;
 import com.demiphea.exception.common.PermissionDeniedException;
 import com.demiphea.model.vo.note.NoteOverviewVo;
+import com.demiphea.model.vo.note.NoteVo;
 import com.demiphea.service.inf.BaseService;
 import com.demiphea.service.inf.note.NoteService;
 import com.demiphea.utils.oss.qiniu.OssUtils;
@@ -18,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * NoteServiceImpl
@@ -30,9 +35,14 @@ import java.time.LocalDateTime;
 public class NoteServiceImpl implements NoteService {
     private final BaseService baseService;
     private final NoteDao noteDao;
+    private final BillDao billDao;
+    private final ViewHistoryDao viewHistoryDao;
 
     @Override
-    public boolean checkAdminPermission(Long id, Long noteId) {
+    public boolean checkAdminPermission(@Nullable Long id, @NotNull Long noteId) {
+        if (id == null) {
+            return false;
+        }
         Note note = noteDao.selectById(noteId);
         if (note == null) {
             throw new ObjectDoesNotExistException("笔记不存在或已删除");
@@ -41,8 +51,34 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public boolean checkAdminPermission(Long id, Note note) {
+    public boolean checkAdminPermission(@Nullable Long id, @NotNull Note note) {
+        if (id == null) {
+            return false;
+        }
         return id.equals(note.getUserId());
+    }
+
+    @Override
+    public boolean checkReadPermission(@Nullable Long id, @NotNull Long noteId) {
+        Note note = noteDao.selectById(noteId);
+        if (note == null) {
+            throw new ObjectDoesNotExistException("笔记不存在或已删除");
+        }
+        return checkReadPermission(id, note);
+    }
+
+    @Override
+    public boolean checkReadPermission(@Nullable Long id, @NotNull Note note) {
+        if (checkAdminPermission(id, note)) {
+            return true;
+        }
+        if (note.getOpenPublic() && (note.getPrice() == null || note.getPrice().compareTo(BigDecimal.ZERO) == 0)) {
+            return true;
+        }
+        if (id == null) {
+            return false;
+        }
+        return billDao.hasBuy(id, note.getId());
     }
 
     @Override
@@ -59,6 +95,9 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public NoteOverviewVo updateNote(@NotNull Long id, @NotNull Long noteId, @Nullable String title, @Nullable MultipartFile cover, @Nullable String content, @Nullable Boolean openPublic, @Nullable BigDecimal price) throws IOException {
         Note note = noteDao.selectById(noteId);
+        if (note == null) {
+            throw new ObjectDoesNotExistException("笔记不存在或已删除");
+        }
         if (!checkAdminPermission(id, note)) {
             throw new PermissionDeniedException("权限拒绝访问操作");
         }
@@ -81,5 +120,27 @@ public class NoteServiceImpl implements NoteService {
             throw new PermissionDeniedException("权限拒绝访问操作");
         }
         noteDao.deleteById(noteId);
+    }
+
+    @Override
+    public NoteVo readNote(@Nullable Long id, @NotNull Long noteId) {
+        Note note = noteDao.selectById(noteId);
+        if (note == null) {
+            throw new ObjectDoesNotExistException("笔记不存在或已删除");
+        }
+        if (!checkReadPermission(id, note)) {
+            throw new PermissionDeniedException("无法访问私有/未购买的笔记");
+        }
+        // 记录阅读历史
+        if (id != null) {
+            CompletableFuture.runAsync(() -> {
+                try {
+                    viewHistoryDao.insert(new ViewHistory(id, noteId, LocalDateTime.now()));
+                } catch (Exception e) {
+                    // ignore
+                }
+            });
+        }
+        return baseService.pack(id, note);
     }
 }

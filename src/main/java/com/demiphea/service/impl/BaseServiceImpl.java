@@ -4,9 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.demiphea.dao.*;
 import com.demiphea.entity.*;
 import com.demiphea.model.api.PageResult;
-import com.demiphea.model.vo.note.NoteConfiguration;
-import com.demiphea.model.vo.note.NoteOverviewState;
-import com.demiphea.model.vo.note.NoteOverviewVo;
+import com.demiphea.model.vo.favorite.FavoriteConfiguration;
+import com.demiphea.model.vo.favorite.FavoriteState;
+import com.demiphea.model.vo.favorite.FavoriteVo;
+import com.demiphea.model.vo.note.*;
 import com.demiphea.model.vo.user.BillVo;
 import com.demiphea.model.vo.user.UserState;
 import com.demiphea.model.vo.user.UserVo;
@@ -35,6 +36,7 @@ public class BaseServiceImpl implements BaseService {
     private final CommentDao commentDao;
     private final FavoriteDao favoriteDao;
     private final NoteDao noteDao;
+    private final CollectionFavoriteDao collectionFavoriteDao;
 
     @Override
     public UserVo convert(@NotNull User user) {
@@ -108,6 +110,23 @@ public class BaseServiceImpl implements BaseService {
     }
 
     @Override
+    public NoteVo pack(@Nullable Long id, @NotNull Note note) {
+        NoteVo noteVo = new NoteVo();
+        noteVo.setOverview(convert(id, note));
+        noteVo.setContent(note.getContent());
+        if (id != null) {
+            List<FavoriteVo> list = noteFavoriteDao.selectList(new LambdaQueryWrapper<NoteFavorite>().eq(NoteFavorite::getNoteId, note.getId())).stream()
+                    .map(NoteFavorite::getFavoriteId)
+                    .map(favoriteDao::selectById)
+                    .filter(favorite -> id.equals(favorite.getUserId()))
+                    .map(favorite -> convert(id, favorite))
+                    .toList();
+            noteVo.setState(new NoteState(list));
+        }
+        return noteVo;
+    }
+
+    @Override
     public BillVo convert(@Nullable Long id, @NotNull Bill bill) {
         BillVo billVo = new BillVo();
         billVo.setId(bill.getId());
@@ -119,6 +138,26 @@ public class BaseServiceImpl implements BaseService {
         }
         billVo.setCreateTime(bill.getCreateTime());
         return billVo;
+    }
+
+    @Override
+    public FavoriteVo convert(@Nullable Long id, @NotNull Favorite favorite) {
+        FavoriteVo favoriteVo = new FavoriteVo();
+        favoriteVo.setId(favorite.getId());
+        favoriteVo.setName(favorite.getFname());
+        favoriteVo.setDescription(favorite.getBriefIntroduction());
+        Long noteCount = noteFavoriteDao.selectCount(new LambdaQueryWrapper<NoteFavorite>().eq(NoteFavorite::getFavoriteId, favorite.getId()));
+        Long collectionCount = collectionFavoriteDao.selectCount(new LambdaQueryWrapper<CollectionFavorite>().eq(CollectionFavorite::getFavoriteId, favorite.getId()));
+        favoriteVo.setNum((int) (noteCount + collectionCount));
+        favoriteVo.setCreateTime(favorite.getCreateTime());
+        if (id != null) {
+            favoriteVo.setState(new FavoriteState(id.equals(favorite.getUserId())));
+        }
+        favoriteVo.setConfiguration(new FavoriteConfiguration(
+                favorite.getOptionPublic(),
+                favorite.getOptionDefault()
+        ));
+        return favoriteVo;
     }
 
     @Override

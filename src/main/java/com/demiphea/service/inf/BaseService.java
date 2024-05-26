@@ -1,10 +1,13 @@
 package com.demiphea.service.inf;
 
 import com.demiphea.entity.Bill;
+import com.demiphea.entity.Favorite;
 import com.demiphea.entity.Note;
 import com.demiphea.entity.User;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.model.vo.note.NoteOverviewVo;
+import com.demiphea.model.vo.note.NoteVo;
 import com.demiphea.model.vo.user.BillVo;
 import com.demiphea.model.vo.user.UserVo;
 import com.github.pagehelper.PageInfo;
@@ -50,6 +53,16 @@ public interface BaseService {
     NoteOverviewVo convert(@Nullable Long id, @NotNull Note note);
 
     /**
+     * 笔记打包
+     *
+     * @param id   当前用户ID
+     * @param note 笔记
+     * @return {@link NoteVo} 笔记VO
+     * @author demiphea
+     */
+    NoteVo pack(@Nullable Long id, @NotNull Note note);
+
+    /**
      * 账单转换
      *
      * @param id   当前用户ID
@@ -58,6 +71,16 @@ public interface BaseService {
      * @author demiphea
      */
     BillVo convert(@Nullable Long id, @NotNull Bill bill);
+
+    /**
+     * 收藏夹转换
+     *
+     * @param id       当前用户ID
+     * @param favorite 收藏夹
+     * @return {@link FavoriteVo} 收藏夹VO
+     * @author demiphea
+     */
+    FavoriteVo convert(@Nullable Long id, @NotNull Favorite favorite);
 
     /**
      * 分页结果转换

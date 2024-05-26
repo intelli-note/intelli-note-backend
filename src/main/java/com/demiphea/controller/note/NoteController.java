@@ -4,6 +4,7 @@ import com.demiphea.auth.Auth;
 import com.demiphea.auth.AuthID;
 import com.demiphea.model.api.ApiResponse;
 import com.demiphea.model.vo.note.NoteOverviewVo;
+import com.demiphea.model.vo.note.NoteVo;
 import com.demiphea.service.inf.note.NoteService;
 import com.demiphea.validation.NullOrNotBlank;
 import jakarta.validation.constraints.DecimalMin;
@@ -88,5 +89,12 @@ public class NoteController {
     ) {
         noteService.deleteNote(id, noteId);
         return ApiResponse.success();
+    }
+
+    @GetMapping("/{noteId}")
+    @Auth(block = false)
+    public ApiResponse readNote(@AuthID Long id, @PathVariable Long noteId) {
+        NoteVo note = noteService.readNote(id, noteId);
+        return ApiResponse.success(note);
     }
 }

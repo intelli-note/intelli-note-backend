@@ -2,6 +2,7 @@ package com.demiphea.service.inf.note;
 
 import com.demiphea.entity.Note;
 import com.demiphea.model.vo.note.NoteOverviewVo;
+import com.demiphea.model.vo.note.NoteVo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,20 +22,40 @@ public interface NoteService {
      *
      * @param id     用户ID
      * @param noteId 笔记ID
-     * @return {@link boolean} 是否具有管理权限
+     * @return 是否具有管理权限
      * @author demiphea
      */
-    boolean checkAdminPermission(Long id, Long noteId);
+    boolean checkAdminPermission(@Nullable Long id, @NotNull Long noteId);
 
     /**
      * 校验是否具有笔记的管理权限
      *
      * @param id   用户ID
      * @param note 笔记
-     * @return {@link boolean} 是否具有管理权限
+     * @return 是否具有管理权限
      * @author demiphea
      */
-    boolean checkAdminPermission(Long id, Note note);
+    boolean checkAdminPermission(@Nullable Long id, @NotNull Note note);
+
+    /**
+     * 校验是否具有笔记的阅读权限
+     *
+     * @param id     用户ID
+     * @param noteId 笔记ID
+     * @return 是否具有阅读权限
+     * @author demiphea
+     */
+    boolean checkReadPermission(@Nullable Long id, @NotNull Long noteId);
+
+    /**
+     * 校验是否具有笔记的阅读权限
+     *
+     * @param id   用户ID
+     * @param note 笔记
+     * @return 是否具有阅读权限
+     * @author demiphea
+     */
+    boolean checkReadPermission(@Nullable Long id, @NotNull Note note);
 
     /**
      * 新增笔记
@@ -73,4 +94,14 @@ public interface NoteService {
      * @author demiphea
      */
     void deleteNote(@NotNull Long id, @NotNull Long noteId);
+
+    /**
+     * 查阅某一个笔记
+     *
+     * @param id     当前用户ID
+     * @param noteId 笔记ID
+     * @return {@link NoteVo} 笔记VO
+     * @author demiphea
+     */
+    NoteVo readNote(@Nullable Long id, @NotNull Long noteId);
 }
