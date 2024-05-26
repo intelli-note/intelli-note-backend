@@ -23,7 +23,7 @@ public interface BillService {
      * @return {@link Boolean} 是否有权限
      * @author demiphea
      */
-    Boolean checkPermission(Long userId, Long billId);
+    Boolean checkPermission(@Nullable Long userId, @NotNull Long billId);
 
     /**
      * 权限校验-查看用户是否有资格操作
@@ -33,7 +33,7 @@ public interface BillService {
      * @return {@link Boolean} 是否有权限
      * @author demiphea
      */
-    Boolean checkPermission(Long userId, Bill bill);
+    Boolean checkPermission(@Nullable Long userId, @NotNull Bill bill);
 
     /**
      * 分页获取用户账单列表
