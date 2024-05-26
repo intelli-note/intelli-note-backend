@@ -36,7 +36,10 @@ public class BillServiceImpl implements BillService {
     private final BillDao billDao;
 
     @Override
-    public Boolean checkPermission(Long userId, Long billId) {
+    public Boolean checkPermission(@Nullable Long userId, @NotNull Long billId) {
+        if (userId == null) {
+            return false;
+        }
         Bill bill = billDao.selectById(billId);
         if (bill == null) {
             throw new ObjectDoesNotExistException("账单不存在或已删除");
@@ -45,7 +48,10 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Boolean checkPermission(Long userId, Bill bill) {
+    public Boolean checkPermission(@Nullable Long userId, @NotNull Bill bill) {
+        if (userId == null) {
+            return false;
+        }
         return userId.equals(bill.getUserId());
     }
 
