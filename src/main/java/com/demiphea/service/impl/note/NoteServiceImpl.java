@@ -3,20 +3,26 @@ package com.demiphea.service.impl.note;
 import com.demiphea.common.Constant;
 import com.demiphea.dao.BillDao;
 import com.demiphea.dao.NoteDao;
+import com.demiphea.dao.UserDao;
 import com.demiphea.dao.ViewHistoryDao;
 import com.demiphea.entity.Note;
+import com.demiphea.entity.User;
 import com.demiphea.entity.ViewHistory;
+import com.demiphea.exception.common.CommonServiceException;
 import com.demiphea.exception.common.ObjectDoesNotExistException;
 import com.demiphea.exception.common.PermissionDeniedException;
+import com.demiphea.model.bo.user.BillType;
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.model.vo.note.NoteVo;
 import com.demiphea.service.inf.BaseService;
+import com.demiphea.service.inf.SystemService;
 import com.demiphea.service.inf.note.NoteService;
 import com.demiphea.utils.oss.qiniu.OssUtils;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -34,9 +40,11 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class NoteServiceImpl implements NoteService {
     private final BaseService baseService;
+    private final SystemService systemService;
     private final NoteDao noteDao;
     private final BillDao billDao;
     private final ViewHistoryDao viewHistoryDao;
+    private final UserDao userDao;
 
     @Override
     public boolean checkAdminPermission(@Nullable Long id, @NotNull Long noteId) {
@@ -142,5 +150,25 @@ public class NoteServiceImpl implements NoteService {
             });
         }
         return baseService.pack(id, note);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public NoteOverviewVo buyNote(@NotNull Long id, @NotNull Long noteId) {
+        if (checkReadPermission(id, noteId) || checkReadPermission(id, noteId)) {
+            throw new CommonServiceException("笔记目前无需购买");
+        }
+        Note note = noteDao.selectById(noteId);
+        if (note == null) {
+            throw new ObjectDoesNotExistException("笔记不存在或已删除");
+        }
+        User user = userDao.selectById(id);
+        if (user.getBalance().compareTo(note.getPrice()) < 0) {
+            throw new CommonServiceException("余额不足，请充值");
+        }
+        user.setBalance(user.getBalance().subtract(note.getPrice()));
+        userDao.updateById(user);
+        systemService.insertBill(id, BillType.EXPEND, note.getPrice(), noteId);
+        return baseService.convert(id, note);
     }
 }
