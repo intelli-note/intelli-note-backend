@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.demiphea.dao.*;
 import com.demiphea.entity.*;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.vo.collection.CollectionConfiguration;
+import com.demiphea.model.vo.collection.CollectionState;
+import com.demiphea.model.vo.collection.CollectionVo;
 import com.demiphea.model.vo.favorite.FavoriteConfiguration;
 import com.demiphea.model.vo.favorite.FavoriteState;
 import com.demiphea.model.vo.favorite.FavoriteVo;
@@ -37,6 +40,7 @@ public class BaseServiceImpl implements BaseService {
     private final FavoriteDao favoriteDao;
     private final NoteDao noteDao;
     private final CollectionFavoriteDao collectionFavoriteDao;
+    private final NoteCollectDao noteCollectDao;
 
     @Override
     public UserVo convert(@NotNull User user) {
@@ -158,6 +162,36 @@ public class BaseServiceImpl implements BaseService {
                 favorite.getOptionDefault()
         ));
         return favoriteVo;
+    }
+
+    @Override
+    public CollectionVo convert(@Nullable Long id, @NotNull Collection collection) {
+        CollectionVo collectionVo = new CollectionVo();
+        collectionVo.setId(collection.getId());
+        collectionVo.setName(collection.getCname());
+        collectionVo.setCover(collection.getCover());
+        collectionVo.setDescription(collection.getBriefIntroduction());
+        Long num = noteCollectDao.selectCount(new LambdaQueryWrapper<NoteCollect>().eq(NoteCollect::getCollectionId, collection.getId()));
+        collectionVo.setNum(num.intValue());
+        Long starNum = collectionFavoriteDao.selectCount(new LambdaQueryWrapper<CollectionFavorite>().eq(CollectionFavorite::getCollectionId, collection.getId()));
+        collectionVo.setStarNum(starNum.toString());
+        collectionVo.setCreateTime(collection.getCreateTime());
+        if (id != null) {
+            CollectionState state = new CollectionState();
+            List<FavoriteVo> list = collectionFavoriteDao.selectList(new LambdaQueryWrapper<CollectionFavorite>().eq(CollectionFavorite::getCollectionId, collection.getId())).stream()
+                    .map(CollectionFavorite::getFavoriteId)
+                    .map(favoriteDao::selectById)
+                    .filter(favorite -> id.equals(favorite.getUserId()))
+                    .distinct()
+                    .map(favorite -> convert(id, favorite))
+                    .toList();
+            state.setStar(!list.isEmpty());
+            state.setOwner(id.equals(collection.getUserId()));
+            state.setFavoriteList(list);
+            collectionVo.setState(state);
+        }
+        collectionVo.setConfiguration(new CollectionConfiguration(collection.getOpenPublic()));
+        return collectionVo;
     }
 
     @Override
