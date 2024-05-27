@@ -1,6 +1,7 @@
 package com.demiphea.model.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -73,4 +74,36 @@ public class PageResult {
      */
     @JsonProperty("last_page")
     private Integer lastPageNum;
+
+    public final static PageResult EMPTY = new PageResult(PageInfo.emptyPageInfo());
+
+    public PageResult(PageInfo<?> pageInfo) {
+        this.pages = pageInfo.getPages();
+        this.pageNum = pageInfo.getPageNum();
+        this.pageSize = pageInfo.getPageSize();
+        this.total = pageInfo.getTotal();
+        this.list = pageInfo.getList();
+        this.size = pageInfo.getSize();
+        this.hasPreviousPage = pageInfo.isHasPreviousPage();
+        this.hasNextPage = pageInfo.isHasNextPage();
+        this.firstPage = pageInfo.isIsFirstPage();
+        this.lastPage = pageInfo.isIsLastPage();
+        this.firstPageNum = pageInfo.getNavigateFirstPage();
+        this.lastPageNum = pageInfo.getNavigateLastPage();
+    }
+
+    public PageResult(PageInfo<?> pageInfo, List<?> list) {
+        this.pages = pageInfo.getPages();
+        this.pageNum = pageInfo.getPageNum();
+        this.pageSize = pageInfo.getPageSize();
+        this.total = pageInfo.getTotal();
+        this.list = list;
+        this.size = pageInfo.getSize();
+        this.hasPreviousPage = pageInfo.isHasPreviousPage();
+        this.hasNextPage = pageInfo.isHasNextPage();
+        this.firstPage = pageInfo.isIsFirstPage();
+        this.lastPage = pageInfo.isIsLastPage();
+        this.firstPageNum = pageInfo.getNavigateFirstPage();
+        this.lastPageNum = pageInfo.getNavigateLastPage();
+    }
 }

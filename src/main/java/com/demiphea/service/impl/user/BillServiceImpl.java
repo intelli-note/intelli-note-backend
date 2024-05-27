@@ -57,7 +57,7 @@ public class BillServiceImpl implements BillService {
         List<Bill> bills = billDao.selectList(new LambdaQueryWrapper<Bill>().eq(Bill::getUserId, id).orderByDesc(Bill::getCreateTime));
         PageInfo<Bill> pageInfo = new PageInfo<>(bills);
         List<BillVo> list = bills.stream().map(bill -> baseService.convert(id, bill)).toList();
-        PageResult result = baseService.convert(pageInfo, list);
+        PageResult result = new PageResult(pageInfo, list);
         page.close();
         return result;
     }

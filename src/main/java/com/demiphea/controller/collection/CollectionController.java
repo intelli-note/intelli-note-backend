@@ -3,9 +3,11 @@ package com.demiphea.controller.collection;
 import com.demiphea.auth.Auth;
 import com.demiphea.auth.AuthID;
 import com.demiphea.model.api.ApiResponse;
+import com.demiphea.model.api.PageResult;
 import com.demiphea.model.vo.collection.CollectionVo;
 import com.demiphea.service.inf.collection.CollectionService;
 import com.demiphea.validation.NullOrNotBlank;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -74,5 +76,26 @@ public class CollectionController {
     public ApiResponse deleteCollection(@AuthID Long id, @PathVariable Long collectionId) {
         collectionService.deleteCollection(id, collectionId);
         return ApiResponse.success();
+    }
+
+
+    @GetMapping
+    @Auth(block = false)
+    public ApiResponse listCollections(
+            @AuthID
+            Long id,
+            @RequestParam(value = "user_id", required = false)
+            Long userId,
+            @RequestParam(value = "note_id", required = false)
+            Long noteId,
+            @RequestParam("page_num")
+            @Min(value = 1, message = "页码需要从1开始")
+            Integer pageNum,
+            @RequestParam("page_size")
+            @Min(value = 1, message = "每页数量必须大于1")
+            Integer pageSize
+    ) {
+        PageResult result = collectionService.listCollections(id, userId, noteId, pageNum, pageSize);
+        return ApiResponse.success(result);
     }
 }

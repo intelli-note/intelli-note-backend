@@ -1,6 +1,7 @@
 package com.demiphea.service.inf.collection;
 
 import com.demiphea.entity.Collection;
+import com.demiphea.model.api.PageResult;
 import com.demiphea.model.vo.collection.CollectionVo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,4 +71,17 @@ public interface CollectionService {
      * @author demiphea
      */
     void deleteCollection(@NotNull Long id, @NotNull Long collectionId);
+
+    /**
+     * 分页获取合集（不能同时传入用户ID和合集ID）
+     *
+     * @param id       当前用户ID
+     * @param userId   用户ID
+     * @param noteId   合集ID
+     * @param pageNum  页码
+     * @param pageSize 每页数量
+     * @return {@link PageResult} 分页查询结果
+     * @author demiphea
+     */
+    PageResult listCollections(@Nullable Long id, @Nullable Long userId, @Nullable Long noteId, @NotNull Integer pageNum, @NotNull Integer pageSize);
 }

@@ -57,7 +57,7 @@ public class FollowServiceImpl implements FollowService {
                 .map(baseService::convert)
                 .map(vo -> baseService.attachState(id, vo))
                 .toList();
-        PageResult result = baseService.convert(pageInfo, list);
+        PageResult result = new PageResult(pageInfo, list);
         page.close();
         return result;
     }
@@ -73,7 +73,7 @@ public class FollowServiceImpl implements FollowService {
                 .map(baseService::convert)
                 .map(vo -> baseService.attachState(id, vo))
                 .toList();
-        PageResult result = baseService.convert(pageInfo, list);
+        PageResult result = new PageResult(pageInfo, list);
         page.close();
         return result;
     }
