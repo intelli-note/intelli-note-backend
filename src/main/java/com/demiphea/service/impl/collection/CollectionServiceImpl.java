@@ -13,6 +13,7 @@ import com.demiphea.exception.common.PermissionDeniedException;
 import com.demiphea.model.api.PageResult;
 import com.demiphea.model.vo.collection.CollectionVo;
 import com.demiphea.service.inf.BaseService;
+import com.demiphea.service.inf.PermissionService;
 import com.demiphea.service.inf.collection.CollectionService;
 import com.demiphea.utils.oss.qiniu.OssUtils;
 import com.github.pagehelper.Page;
@@ -38,29 +39,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CollectionServiceImpl implements CollectionService {
     private final BaseService baseService;
+    private final PermissionService permissionService;
     private final CollectionDao collectionDao;
     private final NoteCollectDao noteCollectDao;
-
-
-    @Override
-    public boolean checkAdminPermission(@Nullable Long id, @NotNull Long collectionId) {
-        if (id == null) {
-            return false;
-        }
-        Collection collection = collectionDao.selectById(collectionId);
-        if (collection == null) {
-            throw new ObjectDoesNotExistException("合集不存在或已删除");
-        }
-        return checkAdminPermission(id, collection);
-    }
-
-    @Override
-    public boolean checkAdminPermission(@Nullable Long id, @NotNull Collection collection) {
-        if (id == null) {
-            return false;
-        }
-        return id.equals(collection.getUserId());
-    }
 
     @Override
     public CollectionVo insertCollection(@NotNull Long id, @NotNull String name, @Nullable MultipartFile cover, @Nullable String description, @NotNull Boolean publicOption) throws IOException {
@@ -87,7 +68,7 @@ public class CollectionServiceImpl implements CollectionService {
         if (collection == null) {
             throw new ObjectDoesNotExistException("合集不存在或已删除");
         }
-        if (!checkAdminPermission(id, collection)) {
+        if (!permissionService.checkCollectionAdminPermission(id, collection)) {
             throw new PermissionDeniedException("权限拒绝访问操作");
         }
         collection.setCname(name);
@@ -104,7 +85,7 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public void deleteCollection(@NotNull Long id, @NotNull Long collectionId) {
-        if (!checkAdminPermission(id, collectionId)) {
+        if (!permissionService.checkCollectionAdminPermission(id, collectionId)) {
             throw new PermissionDeniedException("权限拒绝访问操作");
         }
         collectionDao.deleteById(collectionId);
@@ -148,4 +129,19 @@ public class CollectionServiceImpl implements CollectionService {
         page.close();
         return result;
     }
+
+    @Override
+    public int addNotesToCollections(@NotNull Long id, @NotNull List<Long> noteIds, @NotNull List<Long> collectionIds) {
+        int count = 0;
+        for (int i = 0; i < noteIds.size(); i++) {
+
+            for (int j = 0; j < collectionIds.size(); j++) {
+
+            }
+        }
+
+        return count;
+    }
+
+
 }

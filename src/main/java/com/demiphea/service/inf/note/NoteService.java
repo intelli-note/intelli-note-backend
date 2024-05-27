@@ -1,6 +1,5 @@
 package com.demiphea.service.inf.note;
 
-import com.demiphea.entity.Note;
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.model.vo.note.NoteVo;
 import org.jetbrains.annotations.NotNull;
@@ -17,46 +16,6 @@ import java.math.BigDecimal;
  * @since 17.0.9
  */
 public interface NoteService {
-    /**
-     * 校验是否具有笔记的管理权限
-     *
-     * @param id     用户ID
-     * @param noteId 笔记ID
-     * @return 是否具有管理权限
-     * @author demiphea
-     */
-    boolean checkAdminPermission(@Nullable Long id, @NotNull Long noteId);
-
-    /**
-     * 校验是否具有笔记的管理权限
-     *
-     * @param id   用户ID
-     * @param note 笔记
-     * @return 是否具有管理权限
-     * @author demiphea
-     */
-    boolean checkAdminPermission(@Nullable Long id, @NotNull Note note);
-
-    /**
-     * 校验是否具有笔记的阅读权限
-     *
-     * @param id     用户ID
-     * @param noteId 笔记ID
-     * @return 是否具有阅读权限
-     * @author demiphea
-     */
-    boolean checkReadPermission(@Nullable Long id, @NotNull Long noteId);
-
-    /**
-     * 校验是否具有笔记的阅读权限
-     *
-     * @param id   用户ID
-     * @param note 笔记
-     * @return 是否具有阅读权限
-     * @author demiphea
-     */
-    boolean checkReadPermission(@Nullable Long id, @NotNull Note note);
-
     /**
      * 新增笔记
      *

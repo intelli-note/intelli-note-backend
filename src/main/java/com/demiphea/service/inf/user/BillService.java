@@ -1,9 +1,7 @@
 package com.demiphea.service.inf.user;
 
-import com.demiphea.entity.Bill;
 import com.demiphea.model.api.PageResult;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * BillService
@@ -12,26 +10,6 @@ import org.jetbrains.annotations.Nullable;
  * @since 17.0.9
  */
 public interface BillService {
-    /**
-     * 权限校验-查看用户是否有资格操作
-     *
-     * @param userId 用户ID
-     * @param billId 账单ID
-     * @return {@link Boolean} 是否有权限
-     * @author demiphea
-     */
-    Boolean checkPermission(@Nullable Long userId, @NotNull Long billId);
-
-    /**
-     * 权限校验-查看用户是否有资格操作
-     *
-     * @param userId 用户ID
-     * @param bill   账单
-     * @return {@link Boolean} 是否有权限
-     * @author demiphea
-     */
-    Boolean checkPermission(@Nullable Long userId, @NotNull Bill bill);
-
     /**
      * 分页获取用户账单列表
      *
