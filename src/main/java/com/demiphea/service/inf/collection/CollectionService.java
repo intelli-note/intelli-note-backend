@@ -1,6 +1,5 @@
 package com.demiphea.service.inf.collection;
 
-import com.demiphea.entity.Collection;
 import com.demiphea.model.api.PageResult;
 import com.demiphea.model.vo.collection.CollectionVo;
 import org.jetbrains.annotations.NotNull;
@@ -8,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * CollectionService
@@ -16,26 +16,6 @@ import java.io.IOException;
  * @since 17.0.9
  */
 public interface CollectionService {
-    /**
-     * 校验管理权限
-     *
-     * @param id           当前用户ID
-     * @param collectionId 合集ID
-     * @return 是否有权限
-     * @author demiphea
-     */
-    boolean checkAdminPermission(@Nullable Long id, @NotNull Long collectionId);
-
-    /**
-     * 校验管理权限
-     *
-     * @param id         当前用户ID
-     * @param collection 合集
-     * @return 是否有权限
-     * @author demiphea
-     */
-    boolean checkAdminPermission(@Nullable Long id, @NotNull Collection collection);
-
     /**
      * 新建合集
      *
@@ -84,4 +64,15 @@ public interface CollectionService {
      * @author demiphea
      */
     PageResult listCollections(@Nullable Long id, @Nullable Long userId, @Nullable Long noteId, @NotNull Integer pageNum, @NotNull Integer pageSize);
+
+    /**
+     * 向合集中添加笔记
+     *
+     * @param id            当前用户ID
+     * @param noteIds       笔记ID列表
+     * @param collectionIds 合集ID列表
+     * @return 成功数
+     * @author demiphea
+     */
+    int addNotesToCollections(@NotNull Long id, @NotNull List<Long> noteIds, @NotNull List<Long> collectionIds);
 }

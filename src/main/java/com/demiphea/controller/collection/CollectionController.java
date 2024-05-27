@@ -4,6 +4,7 @@ import com.demiphea.auth.Auth;
 import com.demiphea.auth.AuthID;
 import com.demiphea.model.api.ApiResponse;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.po.note.NoteCollectPo;
 import com.demiphea.model.vo.collection.CollectionVo;
 import com.demiphea.service.inf.collection.CollectionService;
 import com.demiphea.validation.NullOrNotBlank;
@@ -97,5 +98,12 @@ public class CollectionController {
     ) {
         PageResult result = collectionService.listCollections(id, userId, noteId, pageNum, pageSize);
         return ApiResponse.success(result);
+    }
+
+    @PostMapping("/notes")
+    @Auth
+    public ApiResponse addNotesToCollections(@AuthID Long id, @Validated NoteCollectPo noteCollectPo) {
+
+        return ApiResponse.success();
     }
 }

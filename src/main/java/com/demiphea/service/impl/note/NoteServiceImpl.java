@@ -1,7 +1,6 @@
 package com.demiphea.service.impl.note;
 
 import com.demiphea.common.Constant;
-import com.demiphea.dao.BillDao;
 import com.demiphea.dao.NoteDao;
 import com.demiphea.dao.UserDao;
 import com.demiphea.dao.ViewHistoryDao;
@@ -15,6 +14,7 @@ import com.demiphea.model.bo.user.BillType;
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.model.vo.note.NoteVo;
 import com.demiphea.service.inf.BaseService;
+import com.demiphea.service.inf.PermissionService;
 import com.demiphea.service.inf.SystemService;
 import com.demiphea.service.inf.note.NoteService;
 import com.demiphea.utils.oss.qiniu.OssUtils;
@@ -40,54 +40,11 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class NoteServiceImpl implements NoteService {
     private final BaseService baseService;
+    private final PermissionService permissionService;
     private final SystemService systemService;
     private final NoteDao noteDao;
-    private final BillDao billDao;
     private final ViewHistoryDao viewHistoryDao;
     private final UserDao userDao;
-
-    @Override
-    public boolean checkAdminPermission(@Nullable Long id, @NotNull Long noteId) {
-        if (id == null) {
-            return false;
-        }
-        Note note = noteDao.selectById(noteId);
-        if (note == null) {
-            throw new ObjectDoesNotExistException("笔记不存在或已删除");
-        }
-        return checkAdminPermission(id, note);
-    }
-
-    @Override
-    public boolean checkAdminPermission(@Nullable Long id, @NotNull Note note) {
-        if (id == null) {
-            return false;
-        }
-        return id.equals(note.getUserId());
-    }
-
-    @Override
-    public boolean checkReadPermission(@Nullable Long id, @NotNull Long noteId) {
-        Note note = noteDao.selectById(noteId);
-        if (note == null) {
-            throw new ObjectDoesNotExistException("笔记不存在或已删除");
-        }
-        return checkReadPermission(id, note);
-    }
-
-    @Override
-    public boolean checkReadPermission(@Nullable Long id, @NotNull Note note) {
-        if (checkAdminPermission(id, note)) {
-            return true;
-        }
-        if (note.getOpenPublic() && (note.getPrice() == null || note.getPrice().compareTo(BigDecimal.ZERO) == 0)) {
-            return true;
-        }
-        if (id == null) {
-            return false;
-        }
-        return billDao.hasBuy(id, note.getId());
-    }
 
     @Override
     public NoteOverviewVo insertNote(@NotNull Long id, @NotNull String title, @Nullable MultipartFile cover, @NotNull String content, @NotNull Boolean openPublic, @NotNull BigDecimal price) throws IOException {
@@ -106,7 +63,7 @@ public class NoteServiceImpl implements NoteService {
         if (note == null) {
             throw new ObjectDoesNotExistException("笔记不存在或已删除");
         }
-        if (!checkAdminPermission(id, note)) {
+        if (!permissionService.checkNoteAdminPermission(id, note)) {
             throw new PermissionDeniedException("权限拒绝访问操作");
         }
         note.setTitle(title);
@@ -124,7 +81,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public void deleteNote(@NotNull Long id, @NotNull Long noteId) {
-        if (!checkAdminPermission(id, noteId)) {
+        if (!permissionService.checkNoteAdminPermission(id, noteId)) {
             throw new PermissionDeniedException("权限拒绝访问操作");
         }
         noteDao.deleteById(noteId);
@@ -136,7 +93,7 @@ public class NoteServiceImpl implements NoteService {
         if (note == null) {
             throw new ObjectDoesNotExistException("笔记不存在或已删除");
         }
-        if (!checkReadPermission(id, note)) {
+        if (!permissionService.checkNoteReadPermission(id, note)) {
             throw new PermissionDeniedException("无法访问私有/未购买的笔记");
         }
         // 记录阅读历史
@@ -155,7 +112,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public NoteOverviewVo buyNote(@NotNull Long id, @NotNull Long noteId) {
-        if (checkReadPermission(id, noteId) || checkReadPermission(id, noteId)) {
+        if (permissionService.checkNoteAdminPermission(id, noteId) || permissionService.checkNoteReadPermission(id, noteId)) {
             throw new CommonServiceException("笔记目前无需购买");
         }
         Note note = noteDao.selectById(noteId);
