@@ -2,11 +2,8 @@ package com.demiphea.service.inf.user;
 
 import com.demiphea.entity.Bill;
 import com.demiphea.model.api.PageResult;
-import com.demiphea.model.bo.user.BillType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.math.BigDecimal;
 
 /**
  * BillService
@@ -54,15 +51,4 @@ public interface BillService {
      * @author demiphea
      */
     void deleteBill(@NotNull Long id, @NotNull Long billId);
-
-    /**
-     * 插入用户账单（系统调用）
-     *
-     * @param userId 用户ID
-     * @param type   账单类型
-     * @param amount 金额
-     * @param noteId 笔记ID
-     * @author demiphea
-     */
-    void insertBill(@NotNull Long userId, @NotNull BillType type, @NotNull BigDecimal amount, @Nullable Long noteId);
 }

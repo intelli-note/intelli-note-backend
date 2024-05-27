@@ -104,4 +104,14 @@ public interface NoteService {
      * @author demiphea
      */
     NoteVo readNote(@Nullable Long id, @NotNull Long noteId);
+
+    /**
+     * 购买笔记
+     *
+     * @param id     当前用户ID
+     * @param noteId 笔记ID
+     * @return {@link NoteOverviewVo} 笔记概览VO
+     * @author demiphea
+     */
+    NoteOverviewVo buyNote(@NotNull Long id, @NotNull Long noteId);
 }

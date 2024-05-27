@@ -16,7 +16,7 @@ import com.demiphea.model.vo.user.Licence;
 import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.model.vo.user.Wallet;
 import com.demiphea.service.inf.BaseService;
-import com.demiphea.service.inf.user.BillService;
+import com.demiphea.service.inf.SystemService;
 import com.demiphea.service.inf.user.UserService;
 import com.demiphea.utils.oss.qiniu.OssUtils;
 import com.demiphea.utils.wechat.MiniProgramUtils;
@@ -42,8 +42,8 @@ import java.net.URISyntaxException;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final BaseService baseService;
+    private final SystemService systemService;
     private final UserDao userDao;
-    private final BillService billService;
 
     @Override
     public Credential licence(@NotNull String code) throws URISyntaxException, IOException, ParseException {
@@ -119,14 +119,14 @@ public class UserServiceImpl implements UserService {
         switch (type) {
             case IN -> {
                 user.setBalance(user.getBalance().add(delta));
-                billService.insertBill(id, BillType.DEPOSIT, delta, null);
+                systemService.insertBill(id, BillType.DEPOSIT, delta, null);
             }
             case OUT -> {
                 if (user.getBalance().compareTo(delta) < 0) {
                     throw new BalanceDoesNotEnough("用户余额不足");
                 }
                 user.setBalance(user.getBalance().subtract(delta));
-                billService.insertBill(id, BillType.WITHDRAW, delta, null);
+                systemService.insertBill(id, BillType.WITHDRAW, delta, null);
             }
         }
         userDao.updateById(user);
