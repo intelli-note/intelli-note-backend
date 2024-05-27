@@ -9,10 +9,7 @@ import com.demiphea.validation.NullOrNotBlank;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -48,5 +45,34 @@ public class CollectionController {
     ) throws IOException {
         CollectionVo collectionVo = collectionService.insertCollection(id, name, cover, description, publicOption);
         return ApiResponse.success(collectionVo);
+    }
+
+    @PostMapping("/{collectionId}")
+    @Auth
+    public ApiResponse updateCollection(
+            @AuthID
+            Long id,
+            @PathVariable
+            Long collectionId,
+            @RequestParam(required = false)
+            @NullOrNotBlank
+            String name,
+            @RequestParam(required = false)
+            MultipartFile cover,
+            @RequestParam(required = false)
+            @NullOrNotBlank
+            String description,
+            @RequestParam(required = false)
+            Boolean publicOption
+    ) throws IOException {
+        CollectionVo collectionVo = collectionService.updateCollection(id, collectionId, name, cover, description, publicOption);
+        return ApiResponse.success(collectionVo);
+    }
+
+    @DeleteMapping("/{collectionId}")
+    @Auth
+    public ApiResponse deleteCollection(@AuthID Long id, @PathVariable Long collectionId) {
+        collectionService.deleteCollection(id, collectionId);
+        return ApiResponse.success();
     }
 }
