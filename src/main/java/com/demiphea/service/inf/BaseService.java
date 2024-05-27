@@ -1,10 +1,8 @@
 package com.demiphea.service.inf;
 
-import com.demiphea.entity.Bill;
-import com.demiphea.entity.Favorite;
-import com.demiphea.entity.Note;
-import com.demiphea.entity.User;
+import com.demiphea.entity.*;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.vo.collection.CollectionVo;
 import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.model.vo.note.NoteVo;
@@ -81,6 +79,16 @@ public interface BaseService {
      * @author demiphea
      */
     FavoriteVo convert(@Nullable Long id, @NotNull Favorite favorite);
+
+    /**
+     * 合集转换
+     *
+     * @param id         当前用户ID
+     * @param collection 合集
+     * @return {@link CollectionVo} 合集VO
+     * @author demiphea
+     */
+    CollectionVo convert(@Nullable Long id, @NotNull Collection collection);
 
     /**
      * 分页结果转换

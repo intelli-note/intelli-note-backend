@@ -14,4 +14,6 @@ public class Constant {
     public static final List<String> AVATAR_DIR = List.of("intelli-note", "avatar");
 
     public static final List<String> NOTE_COVER_DIR = List.of("intelli-note", "note", "cover");
+
+    public static final List<String> COLLECTION_COVER_DIR = List.of("intelli-note", "collection", "cover");
 }
