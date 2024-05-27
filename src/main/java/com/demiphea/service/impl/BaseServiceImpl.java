@@ -3,7 +3,6 @@ package com.demiphea.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.demiphea.dao.*;
 import com.demiphea.entity.*;
-import com.demiphea.model.api.PageResult;
 import com.demiphea.model.vo.collection.CollectionConfiguration;
 import com.demiphea.model.vo.collection.CollectionState;
 import com.demiphea.model.vo.collection.CollectionVo;
@@ -15,7 +14,6 @@ import com.demiphea.model.vo.user.BillVo;
 import com.demiphea.model.vo.user.UserState;
 import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.service.inf.BaseService;
-import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -192,23 +190,5 @@ public class BaseServiceImpl implements BaseService {
         }
         collectionVo.setConfiguration(new CollectionConfiguration(collection.getOpenPublic()));
         return collectionVo;
-    }
-
-    @Override
-    public PageResult convert(@NotNull PageInfo<?> pageInfo, @NotNull List<?> list) {
-        PageResult result = new PageResult();
-        result.setPages(pageInfo.getPages());
-        result.setPageNum(pageInfo.getPageNum());
-        result.setPageSize(pageInfo.getPageSize());
-        result.setTotal(pageInfo.getTotal());
-        result.setList(list);
-        result.setSize(pageInfo.getSize());
-        result.setHasPreviousPage(pageInfo.isHasPreviousPage());
-        result.setHasNextPage(pageInfo.isHasNextPage());
-        result.setFirstPage(pageInfo.isIsFirstPage());
-        result.setLastPage(pageInfo.isIsLastPage());
-        result.setFirstPageNum(pageInfo.getNavigateFirstPage());
-        result.setLastPageNum(pageInfo.getNavigateLastPage());
-        return result;
     }
 }

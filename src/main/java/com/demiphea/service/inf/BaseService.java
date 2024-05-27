@@ -1,18 +1,14 @@
 package com.demiphea.service.inf;
 
 import com.demiphea.entity.*;
-import com.demiphea.model.api.PageResult;
 import com.demiphea.model.vo.collection.CollectionVo;
 import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.model.vo.note.NoteVo;
 import com.demiphea.model.vo.user.BillVo;
 import com.demiphea.model.vo.user.UserVo;
-import com.github.pagehelper.PageInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * BaseService
@@ -89,14 +85,4 @@ public interface BaseService {
      * @author demiphea
      */
     CollectionVo convert(@Nullable Long id, @NotNull Collection collection);
-
-    /**
-     * 分页结果转换
-     *
-     * @param pageInfo 分页容器
-     * @param list     列表
-     * @return {@link PageResult}
-     * @author demiphea
-     */
-    PageResult convert(@NotNull PageInfo<?> pageInfo, @NotNull List<?> list);
 }
