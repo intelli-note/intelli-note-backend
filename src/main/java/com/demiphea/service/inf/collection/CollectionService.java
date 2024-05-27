@@ -68,8 +68,8 @@ public interface CollectionService {
     /**
      * 向合集中添加笔记
      *
-     * @param id            当前用户ID
-     * @param noteIds       笔记ID列表
+     * @param id 当前用户ID
+     * @param noteIds 笔记ID列表
      * @param collectionIds 合集ID列表
      * @return 成功数
      * @author demiphea

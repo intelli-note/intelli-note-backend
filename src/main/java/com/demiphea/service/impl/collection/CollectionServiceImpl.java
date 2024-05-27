@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -134,12 +135,29 @@ public class CollectionServiceImpl implements CollectionService {
     public int addNotesToCollections(@NotNull Long id, @NotNull List<Long> noteIds, @NotNull List<Long> collectionIds) {
         int count = 0;
         for (int i = 0; i < noteIds.size(); i++) {
-
+            Long noteId = noteIds.get(i);
+            try {
+                Assert.isTrue(permissionService.checkNoteAdminPermission(id, noteId), "[" + noteId + "]: without permission!");
+            } catch (Exception e) {
+                // 笔记不存在或者无权限
+                continue;
+            }
             for (int j = 0; j < collectionIds.size(); j++) {
-
+                Long collectionId = collectionIds.get(j);
+                try {
+                    Assert.isTrue(permissionService.checkCollectionAdminPermission(id, collectionId), "[" + collectionId + "]: without permission!");
+                } catch (Exception e) {
+                    // 合集不存在或无权限
+                    continue;
+                }
+                try {
+                    count += noteCollectDao.insert(new NoteCollect(noteId, collectionId));
+                } catch (Exception e) {
+                    // 重复插入或其他情况
+                    // ignore
+                }
             }
         }
-
         return count;
     }
 

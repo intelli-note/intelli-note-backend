@@ -102,8 +102,8 @@ public class CollectionController {
 
     @PostMapping("/notes")
     @Auth
-    public ApiResponse addNotesToCollections(@AuthID Long id, @Validated NoteCollectPo noteCollectPo) {
-
-        return ApiResponse.success();
+    public ApiResponse addNotesToCollections(@AuthID Long id, @RequestBody @Validated NoteCollectPo noteCollectPo) {
+        int count = collectionService.addNotesToCollections(id, noteCollectPo.getNoteIds(), noteCollectPo.getCollectionIds());
+        return ApiResponse.success(count);
     }
 }
