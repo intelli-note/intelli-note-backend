@@ -75,4 +75,15 @@ public interface CollectionService {
      * @author demiphea
      */
     int addNotesToCollections(@NotNull Long id, @NotNull List<Long> noteIds, @NotNull List<Long> collectionIds);
+
+    /**
+     * 删除合集中的笔记
+     *
+     * @param id           当前用户ID
+     * @param collectionId 合集ID
+     * @param noteIds      笔记ID列表
+     * @return 成功数
+     * @author demiphea
+     */
+    int deleteNotesInCollections(@NotNull Long id, @NotNull Long collectionId, @NotNull List<Long> noteIds);
 }
