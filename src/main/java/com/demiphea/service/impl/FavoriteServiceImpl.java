@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -156,5 +157,81 @@ public class FavoriteServiceImpl implements FavoriteService {
         PageResult result = new PageResult(pageInfo, list);
         page.close();
         return result;
+    }
+
+    @Override
+    public int insertNoteOrCollectionToFavorite(@NotNull Long id, @Nullable List<Long> noteIds, @Nullable List<Long> collectionIds, @NotNull List<Long> favoriteIds) {
+        int count = 0;
+        if (noteIds != null && !noteIds.isEmpty()) {
+            for (int i = 0; i < noteIds.size(); i++) {
+                Long noteId = noteIds.get(i);
+                try {
+                    Assert.isTrue(permissionService.checkNoteReadPermission(id, noteId), "[" + noteId + "]: without read note permission!");
+                } catch (Exception e) {
+                    continue;
+                }
+                for (int j = 0; j < favoriteIds.size(); j++) {
+                    Long favoriteId = favoriteIds.get(j);
+                    try {
+                        Assert.isTrue(permissionService.checkFavoriteAdminPermission(id, favoriteId), "[" + favoriteId + "]: without favorite admin permission!");
+                    } catch (Exception e) {
+                        continue;
+                    }
+                    try {
+                        count += noteFavoriteDao.insert(new NoteFavorite(null, noteId, favoriteId, LocalDateTime.now()));
+                    } catch (Exception e) {
+                        // ignore
+                    }
+                }
+            }
+        }
+        if (collectionIds != null && !collectionIds.isEmpty()) {
+            for (int i = 0; i < collectionIds.size(); i++) {
+                Long collectionId = collectionIds.get(i);
+                try {
+                    Assert.isTrue(permissionService.checkCollectionViewPermission(id, collectionId), "[" + collectionId + "]: without view collection permission!");
+                } catch (Exception e) {
+                    continue;
+                }
+                for (int j = 0; j < favoriteIds.size(); j++) {
+                    Long favoriteId = favoriteIds.get(j);
+                    try {
+                        Assert.isTrue(permissionService.checkFavoriteAdminPermission(id, favoriteId), "[" + favoriteId + "]: without favorite admin permission!");
+                    } catch (Exception e) {
+                        continue;
+                    }
+                    try {
+                        count += collectionFavoriteDao.insert(new CollectionFavorite(null, collectionId, favoriteId, LocalDateTime.now()));
+                    } catch (Exception e) {
+                        // ignore
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public int deleteNoteOrCollectionInFavorite(@NotNull Long id, @NotNull Long favoriteId, @Nullable List<Long> noteIds, @Nullable List<Long> collectionIds) {
+        if (!permissionService.checkFavoriteAdminPermission(id, favoriteId)) {
+            throw new PermissionDeniedException("权限拒绝访问操作");
+        }
+        int count = 0;
+        if (noteIds != null && !noteIds.isEmpty()) {
+            for (int i = 0; i < noteIds.size(); i++) {
+                count += noteFavoriteDao.delete(new LambdaQueryWrapper<NoteFavorite>()
+                        .eq(NoteFavorite::getFavoriteId, favoriteId)
+                        .eq(NoteFavorite::getNoteId, noteIds.get(i)));
+            }
+        }
+
+        if (collectionIds != null && !collectionIds.isEmpty()) {
+            for (int i = 0; i < collectionIds.size(); i++) {
+                count += collectionFavoriteDao.delete(new LambdaQueryWrapper<CollectionFavorite>()
+                        .eq(CollectionFavorite::getFavoriteId, favoriteId)
+                        .eq(CollectionFavorite::getCollectionId, collectionIds.get(i)));
+            }
+        }
+        return count;
     }
 }

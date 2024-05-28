@@ -4,6 +4,7 @@ import com.demiphea.auth.Auth;
 import com.demiphea.auth.AuthID;
 import com.demiphea.model.api.ApiResponse;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.po.favorite.FavoriteManagementPo;
 import com.demiphea.model.po.favorite.FavoritePo;
 import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.service.inf.favorite.FavoriteService;
@@ -12,6 +13,8 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * FavoriteController
@@ -64,5 +67,34 @@ public class FavoriteController {
     ) {
         PageResult result = favoriteService.listFavorites(id, userId, pageNum, pageSize);
         return ApiResponse.success(result);
+    }
+
+    @PostMapping("/management")
+    @Auth
+    public ApiResponse insertNoteOrCollectionToFavorite(
+            @AuthID
+            Long id,
+            @RequestBody
+            @Validated
+            FavoriteManagementPo favoriteManagementPo
+    ) {
+        int count = favoriteService.insertNoteOrCollectionToFavorite(id, favoriteManagementPo.getNoteIds(), favoriteManagementPo.getCollectionIds(), favoriteManagementPo.getFavoriteIds());
+        return ApiResponse.success(count);
+    }
+
+    @DeleteMapping("/management/{favoriteId}")
+    @Auth
+    public ApiResponse deleteNoteOrCollectionInFavorite(
+            @AuthID
+            Long id,
+            @PathVariable
+            Long favoriteId,
+            @RequestParam(value = "note_id", required = false)
+            List<Long> noteIds,
+            @RequestParam(value = "collection_id", required = false)
+            List<Long> collectionIds
+    ) {
+        int count = favoriteService.deleteNoteOrCollectionInFavorite(id, favoriteId, noteIds, collectionIds);
+        return ApiResponse.success(count);
     }
 }

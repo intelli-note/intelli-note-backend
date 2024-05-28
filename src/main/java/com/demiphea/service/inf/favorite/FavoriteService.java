@@ -6,6 +6,8 @@ import com.demiphea.model.vo.favorite.FavoriteVo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * FavoriteService
  *
@@ -54,4 +56,30 @@ public interface FavoriteService {
      * @author demiphea
      */
     PageResult listFavorites(@Nullable Long id, @Nullable Long userId, @NotNull Integer pageNum, @NotNull Integer pageSize);
+
+    /**
+     * 向收藏夹内添加笔记或合集
+     *
+     * @param id            当前用户ID
+     * @param noteIds       笔记ID列表
+     * @param collectionIds 合集ID列表
+     * @param favoriteIds   要添加的收藏夹ID列表
+     * @return 成功数
+     * @author demiphea
+     */
+    int insertNoteOrCollectionToFavorite(@NotNull Long id, @Nullable List<Long> noteIds, @Nullable List<Long> collectionIds, @NotNull List<Long> favoriteIds);
+
+    /**
+     * 收藏夹内删除笔记或合集
+     *
+     * @param id            当前用户ID
+     * @param favoriteId    收藏夹ID
+     * @param noteIds       笔记ID列表
+     * @param collectionIds 合集ID列表
+     * @return 成功数
+     * @author demiphea
+     */
+    int deleteNoteOrCollectionInFavorite(@NotNull Long id, @NotNull Long favoriteId, @Nullable List<Long> noteIds, @Nullable List<Long> collectionIds);
+
+    // TODO 分页获取用户收藏夹内的内容
 }
