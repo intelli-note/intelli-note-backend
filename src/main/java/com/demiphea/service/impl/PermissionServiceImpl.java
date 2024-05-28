@@ -2,9 +2,11 @@ package com.demiphea.service.impl;
 
 import com.demiphea.dao.BillDao;
 import com.demiphea.dao.CollectionDao;
+import com.demiphea.dao.FavoriteDao;
 import com.demiphea.dao.NoteDao;
 import com.demiphea.entity.Bill;
 import com.demiphea.entity.Collection;
+import com.demiphea.entity.Favorite;
 import com.demiphea.entity.Note;
 import com.demiphea.exception.common.ObjectDoesNotExistException;
 import com.demiphea.service.inf.PermissionService;
@@ -27,6 +29,7 @@ public class PermissionServiceImpl implements PermissionService {
     private final BillDao billDao;
     private final NoteDao noteDao;
     private final CollectionDao collectionDao;
+    private final FavoriteDao favoriteDao;
 
     @Override
     public boolean checkBillAdminPermission(@Nullable Long userId, @NotNull Long billId) {
@@ -109,5 +112,42 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
         return id.equals(collection.getUserId());
+    }
+
+    @Override
+    public boolean checkFavoriteAdminPermission(@Nullable Long id, @NotNull Long favoriteId) {
+        if (id == null) {
+            return false;
+        }
+        Favorite favorite = favoriteDao.selectById(favoriteId);
+        if (favorite == null) {
+            throw new ObjectDoesNotExistException("收藏夹不存在或已删除");
+        }
+        return checkFavoriteAdminPermission(id, favorite);
+    }
+
+    @Override
+    public boolean checkFavoriteAdminPermission(@Nullable Long id, @NotNull Favorite favorite) {
+        if (id == null) {
+            return false;
+        }
+        return id.equals(favorite.getUserId());
+    }
+
+    @Override
+    public boolean checkFavoriteViewPermission(@Nullable Long id, @NotNull Long favoriteId) {
+        Favorite favorite = favoriteDao.selectById(favoriteId);
+        if (favorite == null) {
+            throw new ObjectDoesNotExistException("收藏夹不存在或已删除");
+        }
+        return checkFavoriteViewPermission(id, favorite);
+    }
+
+    @Override
+    public boolean checkFavoriteViewPermission(@Nullable Long id, @NotNull Favorite favorite) {
+        if (favorite.getOptionPublic()) {
+            return true;
+        }
+        return checkFavoriteAdminPermission(id, favorite);
     }
 }
