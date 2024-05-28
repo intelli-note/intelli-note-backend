@@ -7,15 +7,21 @@ import com.demiphea.dao.NoteFavoriteDao;
 import com.demiphea.entity.CollectionFavorite;
 import com.demiphea.entity.Favorite;
 import com.demiphea.entity.NoteFavorite;
+import com.demiphea.exception.common.CommonServiceException;
 import com.demiphea.exception.common.ObjectDoesNotExistException;
 import com.demiphea.exception.common.PermissionDeniedException;
+import com.demiphea.model.api.PageResult;
 import com.demiphea.model.po.favorite.FavoritePo;
 import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.service.inf.BaseService;
 import com.demiphea.service.inf.PermissionService;
 import com.demiphea.service.inf.favorite.FavoriteService;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -130,5 +136,25 @@ public class FavoriteServiceImpl implements FavoriteService {
             throw new PermissionDeniedException("权限拒绝访问操作");
         }
         favoriteDao.deleteById(favoriteId);
+    }
+
+    @Override
+    public PageResult listFavorites(@Nullable Long id, @Nullable Long userId, @NotNull Integer pageNum, @NotNull Integer pageSize) {
+        if (id == null && userId == null) {
+            throw new CommonServiceException("如需查询自己的收藏夹，请登录");
+        }
+        if (userId == null) {
+            userId = id;
+        }
+        Page<Object> page = PageHelper.startPage(pageNum, pageSize);
+        List<Favorite> favorites = favoriteDao.selectList(new LambdaQueryWrapper<Favorite>()
+                .eq(Favorite::getUserId, userId)
+                .and(w0 -> w0.eq(Favorite::getOptionPublic, true).or(id != null, w1 -> w1.eq(Favorite::getUserId, id)))
+                .orderByDesc(Favorite::getCreateTime));
+        PageInfo<Favorite> pageInfo = new PageInfo<>(favorites);
+        List<FavoriteVo> list = favorites.stream().map(favorite -> baseService.convert(id, favorite)).toList();
+        PageResult result = new PageResult(pageInfo, list);
+        page.close();
+        return result;
     }
 }
