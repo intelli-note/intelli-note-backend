@@ -2,6 +2,7 @@ package com.demiphea.service.inf;
 
 import com.demiphea.entity.Bill;
 import com.demiphea.entity.Collection;
+import com.demiphea.entity.Favorite;
 import com.demiphea.entity.Note;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -93,5 +94,45 @@ public interface PermissionService {
      * @author demiphea
      */
     boolean checkCollectionAdminPermission(@Nullable Long id, @NotNull Collection collection);
+
+    /**
+     * 校验收藏夹管理权限
+     *
+     * @param id         当前用户ID
+     * @param favoriteId 收藏夹ID
+     * @return 是否有权限
+     * @author demiphea
+     */
+    boolean checkFavoriteAdminPermission(@Nullable Long id, @NotNull Long favoriteId);
+
+    /**
+     * 校验收藏夹管理权限
+     *
+     * @param id       当前用户ID
+     * @param favorite 收藏夹
+     * @return 是否有权限
+     * @author demiphea
+     */
+    boolean checkFavoriteAdminPermission(@Nullable Long id, @NotNull Favorite favorite);
+
+    /**
+     * 校验收藏夹阅读权限
+     *
+     * @param id         当前用户ID
+     * @param favoriteId 收藏夹ID
+     * @return 是否有权限
+     * @author demiphea
+     */
+    boolean checkFavoriteViewPermission(@Nullable Long id, @NotNull Long favoriteId);
+
+    /**
+     * 校验收藏夹阅读权限
+     *
+     * @param id       当前用户ID
+     * @param favorite 收藏夹
+     * @return 是否有权限
+     * @author demiphea
+     */
+    boolean checkFavoriteViewPermission(@Nullable Long id, @NotNull Favorite favorite);
 
 }
