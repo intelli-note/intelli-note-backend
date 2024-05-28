@@ -115,6 +115,23 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    public boolean checkCollectionViewPermission(@Nullable Long id, @NotNull Long collectionId) {
+        Collection collection = collectionDao.selectById(collectionId);
+        if (collection == null) {
+            throw new ObjectDoesNotExistException("合集不存在或已删除");
+        }
+        return checkCollectionViewPermission(id, collection);
+    }
+
+    @Override
+    public boolean checkCollectionViewPermission(@Nullable Long id, @NotNull Collection collection) {
+        if (collection.getOpenPublic()) {
+            return true;
+        }
+        return checkCollectionAdminPermission(id, collection);
+    }
+
+    @Override
     public boolean checkFavoriteAdminPermission(@Nullable Long id, @NotNull Long favoriteId) {
         if (id == null) {
             return false;

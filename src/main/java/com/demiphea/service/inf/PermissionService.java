@@ -96,6 +96,27 @@ public interface PermissionService {
     boolean checkCollectionAdminPermission(@Nullable Long id, @NotNull Collection collection);
 
     /**
+     * 校验合集查看权限
+     *
+     * @param id           当前用户ID
+     * @param collectionId 合集ID
+     * @return 是否有权限
+     * @author demiphea
+     */
+    boolean checkCollectionViewPermission(@Nullable Long id, @NotNull Long collectionId);
+
+    /**
+     * 校验合集查看权限
+     *
+     * @param id         当前用户ID
+     * @param collection 合集
+     * @return 是否有权限
+     * @author demiphea
+     */
+    boolean checkCollectionViewPermission(@Nullable Long id, @NotNull Collection collection);
+
+
+    /**
      * 校验收藏夹管理权限
      *
      * @param id         当前用户ID
