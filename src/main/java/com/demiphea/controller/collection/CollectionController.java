@@ -10,12 +10,14 @@ import com.demiphea.service.inf.collection.CollectionService;
 import com.demiphea.validation.NullOrNotBlank;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * CollectionController
@@ -104,6 +106,21 @@ public class CollectionController {
     @Auth
     public ApiResponse addNotesToCollections(@AuthID Long id, @RequestBody @Validated NoteCollectPo noteCollectPo) {
         int count = collectionService.addNotesToCollections(id, noteCollectPo.getNoteIds(), noteCollectPo.getCollectionIds());
+        return ApiResponse.success(count);
+    }
+
+    @DeleteMapping("/notes/{collectionId}")
+    @Auth
+    public ApiResponse deleteNotesInCollections(
+            @AuthID
+            Long id,
+            @PathVariable
+            Long collectionId,
+            @RequestParam("note_id")
+            @NotEmpty(message = "需要传入合集内需要移除的笔记")
+            List<Long> noteIds
+    ) {
+        int count = collectionService.deleteNotesInCollections(id, collectionId, noteIds);
         return ApiResponse.success(count);
     }
 }

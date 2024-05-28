@@ -161,5 +161,21 @@ public class CollectionServiceImpl implements CollectionService {
         return count;
     }
 
+    @Override
+    public int deleteNotesInCollections(@NotNull Long id, @NotNull Long collectionId, @NotNull List<Long> noteIds) {
+        if (!permissionService.checkCollectionAdminPermission(id, collectionId)) {
+            throw new PermissionDeniedException("权限拒绝访问操作");
+        }
+        int count = 0;
+        for (int i = 0; i < noteIds.size(); i++) {
+            Long noteId = noteIds.get(i);
+            count += noteCollectDao.delete(new LambdaQueryWrapper<NoteCollect>()
+                    .eq(NoteCollect::getNoteId, noteId)
+                    .eq(NoteCollect::getCollectionId, collectionId)
+            );
+        }
+        return count;
+    }
+
 
 }
