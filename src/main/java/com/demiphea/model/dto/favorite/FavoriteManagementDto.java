@@ -1,4 +1,4 @@
-package com.demiphea.model.po.note;
+package com.demiphea.model.dto.favorite;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * NoteCollectPo
+ * FavoriteManagementDto
  *
  * @author demiphea
  * @since 17.0.9
@@ -16,9 +16,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoteCollectPo {
-    @NotEmpty(message = "需要传入要添加的笔记")
+public class FavoriteManagementDto {
     private List<Long> noteIds;
-    @NotEmpty(message = "需要传入添加到的合集")
     private List<Long> collectionIds;
+    @NotEmpty(message = "收藏夹列表不能为空")
+    private List<Long> favoriteIds;
 }

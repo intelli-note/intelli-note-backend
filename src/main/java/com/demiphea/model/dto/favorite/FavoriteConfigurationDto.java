@@ -1,11 +1,11 @@
-package com.demiphea.model.po.favorite;
+package com.demiphea.model.dto.favorite;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * FavoriteConfigurationPo
+ * FavoriteConfigurationDto
  *
  * @author demiphea
  * @since 17.0.9
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FavoriteConfigurationPo {
+public class FavoriteConfigurationDto {
     private boolean publicConfig = true;
     private boolean defaultConfig = false;
 }

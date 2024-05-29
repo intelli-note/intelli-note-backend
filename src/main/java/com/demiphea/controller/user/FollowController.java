@@ -4,7 +4,7 @@ import com.demiphea.auth.Auth;
 import com.demiphea.auth.AuthID;
 import com.demiphea.model.api.ApiResponse;
 import com.demiphea.model.api.PageResult;
-import com.demiphea.model.po.user.FollowPo;
+import com.demiphea.model.dto.user.FollowDto;
 import com.demiphea.service.inf.user.FollowService;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -27,8 +27,8 @@ public class FollowController {
 
     @PostMapping
     @Auth
-    public ApiResponse follow(@AuthID Long id, @RequestBody @Validated FollowPo followPo) {
-        followService.follow(id, followPo.getTargetId());
+    public ApiResponse follow(@AuthID Long id, @RequestBody @Validated FollowDto followDto) {
+        followService.follow(id, followDto.getTargetId());
         return ApiResponse.success();
     }
 

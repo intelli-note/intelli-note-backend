@@ -4,7 +4,7 @@ import com.demiphea.auth.Auth;
 import com.demiphea.auth.AuthID;
 import com.demiphea.model.api.ApiResponse;
 import com.demiphea.model.api.PageResult;
-import com.demiphea.model.po.note.NoteCollectPo;
+import com.demiphea.model.dto.note.NoteCollectDto;
 import com.demiphea.model.vo.collection.CollectionVo;
 import com.demiphea.service.inf.collection.CollectionService;
 import com.demiphea.validation.NullOrNotBlank;
@@ -104,8 +104,8 @@ public class CollectionController {
 
     @PostMapping("/notes")
     @Auth
-    public ApiResponse addNotesToCollections(@AuthID Long id, @RequestBody @Validated NoteCollectPo noteCollectPo) {
-        int count = collectionService.addNotesToCollections(id, noteCollectPo.getNoteIds(), noteCollectPo.getCollectionIds());
+    public ApiResponse addNotesToCollections(@AuthID Long id, @RequestBody @Validated NoteCollectDto noteCollectDto) {
+        int count = collectionService.addNotesToCollections(id, noteCollectDto.getNoteIds(), noteCollectDto.getCollectionIds());
         return ApiResponse.success(count);
     }
 

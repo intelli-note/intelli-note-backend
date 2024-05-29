@@ -10,7 +10,7 @@ import com.demiphea.exception.user.BalanceDoesNotEnough;
 import com.demiphea.exception.user.Code2SessionException;
 import com.demiphea.exception.user.UserDoesNotExistException;
 import com.demiphea.model.bo.user.BillType;
-import com.demiphea.model.po.user.WalletUpdate;
+import com.demiphea.model.dto.user.WalletUpdateDto;
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.Licence;
 import com.demiphea.model.vo.user.UserVo;
@@ -112,9 +112,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Wallet updateUserWallet(@NotNull Long id, @NotNull WalletUpdate update) {
+    public Wallet updateUserWallet(@NotNull Long id, @NotNull WalletUpdateDto update) {
         User user = userDao.selectById(id);
-        WalletUpdate.Operate type = update.getType();
+        WalletUpdateDto.Operate type = update.getType();
         BigDecimal delta = update.getAmount();
         switch (type) {
             case IN -> {

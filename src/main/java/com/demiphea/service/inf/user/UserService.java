@@ -1,6 +1,6 @@
 package com.demiphea.service.inf.user;
 
-import com.demiphea.model.po.user.WalletUpdate;
+import com.demiphea.model.dto.user.WalletUpdateDto;
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.model.vo.user.Wallet;
@@ -69,5 +69,5 @@ public interface UserService {
      * @return {@link Wallet} 钱包信息
      * @author demiphea
      */
-    Wallet updateUserWallet(@NotNull Long id, @NotNull WalletUpdate update);
+    Wallet updateUserWallet(@NotNull Long id, @NotNull WalletUpdateDto update);
 }

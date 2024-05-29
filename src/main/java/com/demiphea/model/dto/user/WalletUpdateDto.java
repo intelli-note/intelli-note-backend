@@ -1,4 +1,4 @@
-package com.demiphea.model.po.user;
+package com.demiphea.model.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.validation.constraints.DecimalMin;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 /**
- * WalletUpdate
+ * WalletUpdateDto
  *
  * @author demiphea
  * @since 17.0.9
@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WalletUpdate {
+public class WalletUpdateDto {
     @NotNull(message = "需要传入操作类型")
     private Operate type;
     @NotNull(message = "需要传入操作金额")
