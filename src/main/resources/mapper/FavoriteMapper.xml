@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demiphea.dao.FavoriteDao">
+    <resultMap id="favoriteObject" type="com.demiphea.model.po.FavoriteObject">
+        <result property="id" column="object_id"/>
+        <result property="type" column="type"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="listFavoriteContent" resultMap="favoriteObject">
+        SELECT object_id, type, create_time
+        FROM (
+        SELECT note_id AS object_id, TRUE AS type, create_time
+        FROM note_favorite
+        WHERE favorite_id = #{favoriteId}
+        AND note_id IN (SELECT id
+        FROM note
+        WHERE is_open_public = TRUE
+        <if test="userId != null">
+            OR user_id = #{userId}
+        </if>)
+        UNION ALL
+        SELECT collection_id AS object_id, FALSE AS type, create_time
+        FROM collection_favorite
+        WHERE favorite_id = #{favoriteId}
+        AND collection_id IN (SELECT id
+        FROM collection
+        WHERE is_open_public = TRUE
+        <if test="userId != null">
+            OR user_id = #{userId}
+        </if>)
+        ) AS favorite_content ORDER BY create_time DESC
+    </select>
+</mapper>

@@ -3,7 +3,7 @@ package com.demiphea.controller.user;
 import com.demiphea.auth.Auth;
 import com.demiphea.auth.AuthID;
 import com.demiphea.model.api.ApiResponse;
-import com.demiphea.model.po.user.WalletUpdate;
+import com.demiphea.model.dto.user.WalletUpdateDto;
 import com.demiphea.model.vo.user.Wallet;
 import com.demiphea.service.inf.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +32,8 @@ public class WalletController {
 
     @PutMapping
     @Auth
-    public ApiResponse updateUserWallet(@AuthID Long id, @RequestBody @Validated WalletUpdate walletUpdate) {
-        Wallet wallet = userService.updateUserWallet(id, walletUpdate);
+    public ApiResponse updateUserWallet(@AuthID Long id, @RequestBody @Validated WalletUpdateDto walletUpdateDto) {
+        Wallet wallet = userService.updateUserWallet(id, walletUpdateDto);
         return ApiResponse.success(wallet);
     }
 

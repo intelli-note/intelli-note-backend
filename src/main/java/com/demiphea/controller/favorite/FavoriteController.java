@@ -4,8 +4,8 @@ import com.demiphea.auth.Auth;
 import com.demiphea.auth.AuthID;
 import com.demiphea.model.api.ApiResponse;
 import com.demiphea.model.api.PageResult;
-import com.demiphea.model.po.favorite.FavoriteManagementPo;
-import com.demiphea.model.po.favorite.FavoritePo;
+import com.demiphea.model.dto.favorite.FavoriteDto;
+import com.demiphea.model.dto.favorite.FavoriteManagementDto;
 import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.service.inf.favorite.FavoriteService;
 import com.demiphea.validation.group.SimpleOperate;
@@ -31,16 +31,16 @@ public class FavoriteController {
 
     @PostMapping
     @Auth
-    public ApiResponse insertFavorite(@AuthID Long id, @RequestBody @Validated(SimpleOperate.Insert.class) FavoritePo favoritePo) {
-        FavoriteVo favoriteVo = favoriteService.insertFavorite(id, favoritePo);
+    public ApiResponse insertFavorite(@AuthID Long id, @RequestBody @Validated(SimpleOperate.Insert.class) FavoriteDto favoriteDto) {
+        FavoriteVo favoriteVo = favoriteService.insertFavorite(id, favoriteDto);
         return ApiResponse.success(favoriteVo);
     }
 
     @PutMapping("/{favoriteId}")
     @Auth
-    public ApiResponse updateFavorite(@AuthID Long id, @PathVariable Long favoriteId, @RequestBody @Validated(SimpleOperate.Update.class) FavoritePo favoritePo) {
-        favoritePo.setFavoriteId(favoriteId);
-        FavoriteVo favoriteVo = favoriteService.updateFavorite(id, favoritePo);
+    public ApiResponse updateFavorite(@AuthID Long id, @PathVariable Long favoriteId, @RequestBody @Validated(SimpleOperate.Update.class) FavoriteDto favoriteDto) {
+        favoriteDto.setFavoriteId(favoriteId);
+        FavoriteVo favoriteVo = favoriteService.updateFavorite(id, favoriteDto);
         return ApiResponse.success(favoriteVo);
     }
 
@@ -76,9 +76,9 @@ public class FavoriteController {
             Long id,
             @RequestBody
             @Validated
-            FavoriteManagementPo favoriteManagementPo
+            FavoriteManagementDto favoriteManagementDto
     ) {
-        int count = favoriteService.insertNoteOrCollectionToFavorite(id, favoriteManagementPo.getNoteIds(), favoriteManagementPo.getCollectionIds(), favoriteManagementPo.getFavoriteIds());
+        int count = favoriteService.insertNoteOrCollectionToFavorite(id, favoriteManagementDto.getNoteIds(), favoriteManagementDto.getCollectionIds(), favoriteManagementDto.getFavoriteIds());
         return ApiResponse.success(count);
     }
 
@@ -96,5 +96,23 @@ public class FavoriteController {
     ) {
         int count = favoriteService.deleteNoteOrCollectionInFavorite(id, favoriteId, noteIds, collectionIds);
         return ApiResponse.success(count);
+    }
+
+    @GetMapping("/management")
+    @Auth(block = false)
+    public ApiResponse listFavoriteContent(
+            @AuthID
+            Long id,
+            @RequestParam("favorite_id")
+            Long favoriteId,
+            @RequestParam("page_num")
+            @Min(value = 1, message = "页码需要从1开始")
+            Integer pageNum,
+            @RequestParam("page_size")
+            @Min(value = 1, message = "每页数量必须大于1")
+            Integer pageSize
+    ) {
+        PageResult result = favoriteService.listFavoriteContent(id, favoriteId, pageNum, pageSize);
+        return ApiResponse.success(result);
     }
 }

@@ -1,4 +1,4 @@
-package com.demiphea.model.po.user;
+package com.demiphea.model.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * FollowPo
+ * FollowDto
  *
  * @author demiphea
  * @since 17.0.9
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FollowPo {
+public class FollowDto {
     @NotNull(message = "未传入关注用户")
     @JsonProperty("userId")
     Long targetId;

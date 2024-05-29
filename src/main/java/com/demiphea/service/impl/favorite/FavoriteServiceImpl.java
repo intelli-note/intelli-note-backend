@@ -1,17 +1,14 @@
-package com.demiphea.service.impl;
+package com.demiphea.service.impl.favorite;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.demiphea.dao.CollectionFavoriteDao;
-import com.demiphea.dao.FavoriteDao;
-import com.demiphea.dao.NoteFavoriteDao;
-import com.demiphea.entity.CollectionFavorite;
-import com.demiphea.entity.Favorite;
-import com.demiphea.entity.NoteFavorite;
+import com.demiphea.dao.*;
+import com.demiphea.entity.*;
 import com.demiphea.exception.common.CommonServiceException;
 import com.demiphea.exception.common.ObjectDoesNotExistException;
 import com.demiphea.exception.common.PermissionDeniedException;
 import com.demiphea.model.api.PageResult;
-import com.demiphea.model.po.favorite.FavoritePo;
+import com.demiphea.model.dto.favorite.FavoriteDto;
+import com.demiphea.model.po.FavoriteObject;
 import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.service.inf.BaseService;
 import com.demiphea.service.inf.PermissionService;
@@ -42,6 +39,8 @@ public class FavoriteServiceImpl implements FavoriteService {
     private final BaseService baseService;
     private final PermissionService permissionService;
     private final FavoriteDao favoriteDao;
+    private final NoteDao noteDao;
+    private final CollectionDao collectionDao;
     private final NoteFavoriteDao noteFavoriteDao;
     private final CollectionFavoriteDao collectionFavoriteDao;
 
@@ -64,24 +63,24 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public FavoriteVo insertFavorite(@NotNull Long id, @NotNull FavoritePo favoritePo) {
-        if (favoritePo.getConfiguration().isDefaultConfig()) {
+    public FavoriteVo insertFavorite(@NotNull Long id, @NotNull FavoriteDto favoriteDto) {
+        if (favoriteDto.getConfiguration().isDefaultConfig()) {
             cancelDefaultFavorite(id);
         }
         Favorite favorite = new Favorite(
                 null,
-                favoritePo.getName(),
-                favoritePo.getDescription(),
+                favoriteDto.getName(),
+                favoriteDto.getDescription(),
                 id,
                 LocalDateTime.now(),
-                favoritePo.getConfiguration().isPublicConfig(),
-                favoritePo.getConfiguration().isDefaultConfig()
+                favoriteDto.getConfiguration().isPublicConfig(),
+                favoriteDto.getConfiguration().isDefaultConfig()
         );
         favoriteDao.insert(favorite);
-        if (favoritePo.getFavoriteId() != null) {
+        if (favoriteDto.getFavoriteId() != null) {
             // 异步克隆收藏夹
             CompletableFuture.runAsync(() -> {
-                Long favoriteId = favoritePo.getFavoriteId();
+                Long favoriteId = favoriteDto.getFavoriteId();
                 if (!permissionService.checkFavoriteViewPermission(id, favoriteId)) {
                     return;
                 }
@@ -112,21 +111,21 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public FavoriteVo updateFavorite(@NotNull Long id, @NotNull FavoritePo favoritePo) {
-        if (favoritePo.getConfiguration().isDefaultConfig()) {
+    public FavoriteVo updateFavorite(@NotNull Long id, @NotNull FavoriteDto favoriteDto) {
+        if (favoriteDto.getConfiguration().isDefaultConfig()) {
             cancelDefaultFavorite(id);
         }
-        Favorite favorite = favoriteDao.selectById(favoritePo.getFavoriteId());
+        Favorite favorite = favoriteDao.selectById(favoriteDto.getFavoriteId());
         if (favorite == null) {
             throw new ObjectDoesNotExistException("收藏夹不存在或已删除");
         }
         if (!permissionService.checkFavoriteAdminPermission(id, favorite)) {
             throw new PermissionDeniedException("权限拒绝访问操作");
         }
-        favorite.setFname(favoritePo.getName());
-        favorite.setBriefIntroduction(favoritePo.getDescription());
-        favorite.setOptionPublic(favoritePo.getConfiguration().isPublicConfig());
-        favorite.setOptionDefault(favoritePo.getConfiguration().isDefaultConfig());
+        favorite.setFname(favoriteDto.getName());
+        favorite.setBriefIntroduction(favoriteDto.getDescription());
+        favorite.setOptionPublic(favoriteDto.getConfiguration().isPublicConfig());
+        favorite.setOptionDefault(favoriteDto.getConfiguration().isDefaultConfig());
         favoriteDao.updateById(favorite);
         return baseService.convert(id, favoriteDao.selectById(favorite.getId()));
     }
@@ -233,5 +232,26 @@ public class FavoriteServiceImpl implements FavoriteService {
             }
         }
         return count;
+    }
+
+    @Override
+    public PageResult listFavoriteContent(@Nullable Long id, @NotNull Long favoriteId, @NotNull Integer pageNum, @NotNull Integer pageSize) {
+        if (!permissionService.checkFavoriteViewPermission(id, favoriteId)) {
+            throw new PermissionDeniedException("权限拒绝访问操作");
+        }
+        Page<Object> page = PageHelper.startPage(pageNum, pageSize);
+        List<FavoriteObject> favoriteObjects = favoriteDao.listFavoriteContent(id, favoriteId);
+        PageInfo<FavoriteObject> pageInfo = new PageInfo<>(favoriteObjects);
+        List<Object> list = favoriteObjects.stream().map(favoriteObject -> {
+            if (favoriteObject.getType()) {
+                Note note = noteDao.selectById(favoriteObject.getId());
+                return baseService.convert(id, note);
+            }
+            Collection collection = collectionDao.selectById(favoriteObject.getId());
+            return baseService.convert(id, collection);
+        }).toList();
+        PageResult result = new PageResult(pageInfo, list);
+        page.close();
+        return result;
     }
 }
