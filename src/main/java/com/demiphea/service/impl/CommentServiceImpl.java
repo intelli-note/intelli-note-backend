@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.demiphea.dao.CommentDao;
 import com.demiphea.entity.Comment;
 import com.demiphea.exception.common.CommonServiceException;
+import com.demiphea.exception.common.PermissionDeniedException;
 import com.demiphea.model.dto.comment.CommentDto;
 import com.demiphea.model.vo.comment.CommentVo;
 import com.demiphea.service.inf.BaseService;
@@ -53,5 +54,13 @@ public class CommentServiceImpl implements CommentService {
             throw new CommonServiceException("关联笔记不存在");
         }
         return baseService.convert(id, comment);
+    }
+
+    @Override
+    public void deleteComment(@NotNull Long id, @NotNull Long commentId) {
+        if (!permissionService.checkCommentAdminPermission(id, commentId)) {
+            throw new PermissionDeniedException("权限拒绝操作");
+        }
+        commentDao.deleteById(commentId);
     }
 }

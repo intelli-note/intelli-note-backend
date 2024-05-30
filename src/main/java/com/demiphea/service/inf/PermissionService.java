@@ -1,9 +1,6 @@
 package com.demiphea.service.inf;
 
-import com.demiphea.entity.Bill;
-import com.demiphea.entity.Collection;
-import com.demiphea.entity.Favorite;
-import com.demiphea.entity.Note;
+import com.demiphea.entity.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,6 +71,26 @@ public interface PermissionService {
      * @author demiphea
      */
     boolean checkNoteReadPermission(@Nullable Long id, @NotNull Note note);
+
+    /**
+     * 校验是否具有评论的管理权限
+     *
+     * @param id        用户ID
+     * @param commentId 评论ID
+     * @return 是否有管理权限
+     * @author demiphea
+     */
+    boolean checkCommentAdminPermission(@Nullable Long id, @NotNull Long commentId);
+
+    /**
+     * 校验是否具有评论的管理权限
+     *
+     * @param id      用户ID
+     * @param comment 评论
+     * @return 是否有管理权限
+     * @author demiphea
+     */
+    boolean checkCommentAdminPermission(@Nullable Long id, @NotNull Comment comment);
 
     /**
      * 校验合集管理权限

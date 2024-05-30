@@ -1,13 +1,7 @@
 package com.demiphea.service.impl;
 
-import com.demiphea.dao.BillDao;
-import com.demiphea.dao.CollectionDao;
-import com.demiphea.dao.FavoriteDao;
-import com.demiphea.dao.NoteDao;
-import com.demiphea.entity.Bill;
-import com.demiphea.entity.Collection;
-import com.demiphea.entity.Favorite;
-import com.demiphea.entity.Note;
+import com.demiphea.dao.*;
+import com.demiphea.entity.*;
 import com.demiphea.exception.common.ObjectDoesNotExistException;
 import com.demiphea.service.inf.PermissionService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +22,7 @@ import java.math.BigDecimal;
 public class PermissionServiceImpl implements PermissionService {
     private final BillDao billDao;
     private final NoteDao noteDao;
+    private final CommentDao commentDao;
     private final CollectionDao collectionDao;
     private final FavoriteDao favoriteDao;
 
@@ -92,6 +87,23 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
         return billDao.hasBuy(id, note.getId());
+    }
+
+    @Override
+    public boolean checkCommentAdminPermission(@Nullable Long id, @NotNull Long commentId) {
+        Comment comment = commentDao.selectById(commentId);
+        if (comment == null) {
+            throw new ObjectDoesNotExistException("评论不存在或已删除");
+        }
+        return checkCommentAdminPermission(id, comment);
+    }
+
+    @Override
+    public boolean checkCommentAdminPermission(@Nullable Long id, @NotNull Comment comment) {
+        if (id == null) {
+            return false;
+        }
+        return id.equals(comment.getUserId());
     }
 
     @Override
