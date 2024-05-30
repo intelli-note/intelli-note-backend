@@ -1,11 +1,14 @@
 package com.demiphea.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.demiphea.dao.*;
 import com.demiphea.entity.*;
 import com.demiphea.model.vo.collection.CollectionConfiguration;
 import com.demiphea.model.vo.collection.CollectionState;
 import com.demiphea.model.vo.collection.CollectionVo;
+import com.demiphea.model.vo.comment.CommentState;
+import com.demiphea.model.vo.comment.CommentVo;
 import com.demiphea.model.vo.favorite.FavoriteConfiguration;
 import com.demiphea.model.vo.favorite.FavoriteState;
 import com.demiphea.model.vo.favorite.FavoriteVo;
@@ -39,6 +42,7 @@ public class BaseServiceImpl implements BaseService {
     private final NoteDao noteDao;
     private final CollectionFavoriteDao collectionFavoriteDao;
     private final NoteCollectDao noteCollectDao;
+    private final CommentLikeDao commentLikeDao;
 
     @Override
     public UserVo convert(@NotNull User user) {
@@ -109,6 +113,42 @@ public class BaseServiceImpl implements BaseService {
                 note.getPrice()
         ));
         return noteOverviewVo;
+    }
+
+    @Override
+    public CommentVo convert(@Nullable Long id, @NotNull Comment comment) {
+        CommentVo commentVo = new CommentVo();
+        commentVo.setId(comment.getId());
+        UserVo user = convert(userDao.selectById(comment.getUserId()));
+        if (id != null) {
+            attachState(id, user);
+        }
+        commentVo.setUser(user);
+        commentVo.setText(comment.getContent());
+        commentVo.setImageList(JSON.parseArray(comment.getImageList(), String.class));
+        commentVo.setAudio(comment.getAudio());
+        commentVo.setVideo(comment.getVideo());
+        if (comment.getLinkNoteId() != null) {
+            Note note = noteDao.selectById(comment.getLinkNoteId());
+            if (note != null) {
+                commentVo.setNote(convert(id, note));
+            } else {
+                // 表示引用笔记已删除
+                commentVo.setNote(new NoteOverviewVo());
+            }
+        }
+        Long likeCount = commentLikeDao.selectCount(new LambdaQueryWrapper<CommentLike>().eq(CommentLike::getCommentId, comment.getId()));
+        commentVo.setAgreeNum(likeCount.toString());
+        Long replyCount = commentDao.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getParentId, comment.getId()));
+        commentVo.setReplyNum(replyCount.toString());
+        commentVo.setCreateTime(comment.getCreateTime());
+        if (id != null) {
+            boolean agreeStatus = commentLikeDao.exists(new LambdaQueryWrapper<CommentLike>()
+                    .eq(CommentLike::getCommentId, comment.getId())
+                    .eq(CommentLike::getUserId, id));
+            commentVo.setState(new CommentState(agreeStatus));
+        }
+        return commentVo;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.demiphea.service.inf;
 
 import com.demiphea.entity.*;
 import com.demiphea.model.vo.collection.CollectionVo;
+import com.demiphea.model.vo.comment.CommentVo;
 import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.model.vo.note.NoteVo;
@@ -45,6 +46,16 @@ public interface BaseService {
      * @author demiphea
      */
     NoteOverviewVo convert(@Nullable Long id, @NotNull Note note);
+
+    /**
+     * 评论转换
+     *
+     * @param id      当前用户ID
+     * @param comment 评论
+     * @return {@link CommentVo} 评论VO
+     * @author demiphea
+     */
+    CommentVo convert(@Nullable Long id, @NotNull Comment comment);
 
     /**
      * 笔记打包

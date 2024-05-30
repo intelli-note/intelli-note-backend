@@ -29,10 +29,10 @@ public class CommentLike {
     private Long id;
 
     /**
-     * 笔记ID
+     * 评论ID
      */
-    @TableField("note_id")
-    private Long noteId;
+    @TableField("comment_id")
+    private Long commentId;
 
     /**
      * 用户ID
