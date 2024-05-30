@@ -20,4 +20,13 @@ public interface CommentService {
      * @author demiphea
      */
     CommentVo insertComment(@NotNull Long id, @NotNull CommentDto commentDto);
+
+    /**
+     * 删除评论
+     *
+     * @param id        当前用户ID
+     * @param commentId 评论ID
+     * @author demiphea
+     */
+    void deleteComment(@NotNull Long id, @NotNull Long commentId);
 }

@@ -8,10 +8,7 @@ import com.demiphea.model.vo.comment.CommentVo;
 import com.demiphea.service.inf.comment.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * CommentController
@@ -31,5 +28,12 @@ public class CommentController {
     public ApiResponse insertComment(@AuthID Long id, @RequestBody @Validated CommentDto commentDto) {
         CommentVo commentVo = commentService.insertComment(id, commentDto);
         return ApiResponse.success(commentVo);
+    }
+
+    @DeleteMapping("/{commentId}")
+    @Auth
+    public ApiResponse deleteComment(@AuthID Long id, @PathVariable Long commentId) {
+        commentService.deleteComment(id, commentId);
+        return ApiResponse.success();
     }
 }
