@@ -139,14 +139,16 @@ public class BaseServiceImpl implements BaseService {
         }
         Long likeCount = commentLikeDao.selectCount(new LambdaQueryWrapper<CommentLike>().eq(CommentLike::getCommentId, comment.getId()));
         commentVo.setAgreeNum(likeCount.toString());
+        commentVo.setAgreeNumber(likeCount);
         Long replyCount = commentDao.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getParentId, comment.getId()));
         commentVo.setReplyNum(replyCount.toString());
+        commentVo.setReplyNumber(replyCount);
         commentVo.setCreateTime(comment.getCreateTime());
         if (id != null) {
             boolean agreeStatus = commentLikeDao.exists(new LambdaQueryWrapper<CommentLike>()
                     .eq(CommentLike::getCommentId, comment.getId())
                     .eq(CommentLike::getUserId, id));
-            commentVo.setState(new CommentState(agreeStatus));
+            commentVo.setState(new CommentState(agreeStatus, id.equals(comment.getUserId())));
         }
         return commentVo;
     }

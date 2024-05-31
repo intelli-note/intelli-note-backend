@@ -2,6 +2,7 @@ package com.demiphea.model.vo.comment;
 
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.model.vo.user.UserVo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,8 +34,12 @@ public class CommentVo {
 
     @JsonProperty("agree_num")
     private String agreeNum;
+    @JsonIgnore
+    private Long agreeNumber;
     @JsonProperty("reply_num")
     private String replyNum;
+    @JsonIgnore
+    private Long replyNumber;
     @JsonProperty("create_time")
     private LocalDateTime createTime;
 

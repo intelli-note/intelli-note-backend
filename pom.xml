@@ -18,6 +18,13 @@
         <kotlin.version>1.9.22</kotlin.version>
     </properties>
     <dependencies>
+        <!-- big-math -->
+        <dependency>
+            <groupId>ch.obermuhlner</groupId>
+            <artifactId>big-math</artifactId>
+            <version>2.3.2</version>
+        </dependency>
+
         <!-- 阿里云 -->
         <dependency>
             <groupId>com.aliyun</groupId>

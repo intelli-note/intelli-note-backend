@@ -17,4 +17,8 @@ import lombok.NoArgsConstructor;
 public class CommentState {
     @JsonProperty("agree_status")
     private Boolean agreeStatus;
+
+    @JsonProperty("owner_status")
+    private Boolean ownerStatus;
+
 }
