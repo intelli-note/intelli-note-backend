@@ -65,4 +65,18 @@ public class CommentController {
         }
         return ApiResponse.success(result);
     }
+
+    @PostMapping("/like/{commentId}")
+    @Auth
+    public ApiResponse upVote(@AuthID Long id, @PathVariable Long commentId) {
+        commentService.upVote(id, commentId);
+        return ApiResponse.success();
+    }
+
+    @DeleteMapping("/like/{commentId}")
+    @Auth
+    public ApiResponse downVote(@AuthID Long id, @PathVariable Long commentId) {
+        commentService.downVote(id, commentId);
+        return ApiResponse.success();
+    }
 }

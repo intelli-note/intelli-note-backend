@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.demiphea.core.CommentComparator;
 import com.demiphea.dao.CommentDao;
+import com.demiphea.dao.CommentLikeDao;
 import com.demiphea.entity.Comment;
+import com.demiphea.entity.CommentLike;
 import com.demiphea.exception.common.CommonServiceException;
 import com.demiphea.exception.common.PermissionDeniedException;
 import com.demiphea.model.api.PageResult;
@@ -40,6 +42,7 @@ public class CommentServiceImpl implements CommentService {
     private final BaseService baseService;
     private final PermissionService permissionService;
     private final CommentDao commentDao;
+    private final CommentLikeDao commentLikeDao;
 
     private final Comparator<CommentVo> comparator = new CommentComparator();
 
@@ -62,6 +65,31 @@ public class CommentServiceImpl implements CommentService {
         }
         return result;
     }
+
+    private void refreshReplyNum(Long commentId) {
+        CompletableFuture.runAsync(() -> {
+            Long replyNum = commentDao.selectCount(new LambdaQueryWrapper<Comment>()
+                    .eq(Comment::getParentId, commentId)
+            );
+            commentDao.update(new LambdaUpdateWrapper<Comment>()
+                    .eq(Comment::getId, commentId)
+                    .set(Comment::getReplyNum, replyNum)
+            );
+        });
+    }
+
+    private void refreshAgreeNum(Long commentId) {
+        CompletableFuture.runAsync(() -> {
+            Long agreeNum = commentLikeDao.selectCount(new LambdaQueryWrapper<CommentLike>()
+                    .eq(CommentLike::getCommentId, commentId)
+            );
+            commentDao.update(new LambdaUpdateWrapper<Comment>()
+                    .eq(Comment::getId, commentId)
+                    .set(Comment::getAgreeNum, agreeNum)
+            );
+        });
+    }
+
 
     @Override
     public CommentVo insertComment(@NotNull Long id, @NotNull CommentDto commentDto) {
@@ -92,15 +120,7 @@ public class CommentServiceImpl implements CommentService {
         }
         if (comment.getParentId() != null) {
             // 刷新父评论的回复数
-            CompletableFuture.runAsync(() -> {
-                Long replyNum = commentDao.selectCount(new LambdaQueryWrapper<Comment>()
-                        .eq(Comment::getParentId, comment.getParentId())
-                );
-                commentDao.update(new LambdaUpdateWrapper<Comment>()
-                        .eq(Comment::getId, comment.getParentId())
-                        .set(Comment::getReplyNum, replyNum)
-                );
-            });
+            refreshReplyNum(comment.getParentId());
         }
         return baseService.convert(id, comment);
     }
@@ -117,15 +137,7 @@ public class CommentServiceImpl implements CommentService {
         commentDao.deleteById(comment);
         if (comment.getParentId() != null) {
             // 刷新父评论的回复数
-            CompletableFuture.runAsync(() -> {
-                Long replyNum = commentDao.selectCount(new LambdaQueryWrapper<Comment>()
-                        .eq(Comment::getParentId, comment.getParentId())
-                );
-                commentDao.update(new LambdaUpdateWrapper<Comment>()
-                        .eq(Comment::getId, comment.getParentId())
-                        .set(Comment::getReplyNum, replyNum)
-                );
-            });
+            refreshReplyNum(comment.getParentId());
         }
     }
 
@@ -163,5 +175,29 @@ public class CommentServiceImpl implements CommentService {
         PageResult result = new PageResult(pageInfo, list);
         page.close();
         return result;
+    }
+
+    @Override
+    public void upVote(@NotNull Long id, @NotNull Long commentId) {
+        try {
+            commentLikeDao.insert(new CommentLike(
+                    null,
+                    commentId,
+                    id,
+                    LocalDateTime.now()
+            ));
+            refreshAgreeNum(commentId);
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
+    @Override
+    public void downVote(@NotNull Long id, @NotNull Long commentId) {
+        commentLikeDao.delete(new LambdaQueryWrapper<CommentLike>()
+                .eq(CommentLike::getCommentId, commentId)
+                .eq(CommentLike::getUserId, id)
+        );
+        refreshAgreeNum(commentId);
     }
 }
