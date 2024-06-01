@@ -56,4 +56,22 @@ public interface CommentService {
      * @author demiphea
      */
     PageResult listSecondComments(@Nullable Long id, @NotNull Long rootId, @NotNull Integer pageNum, @NotNull Integer pageSize);
+
+    /**
+     * 评论点赞
+     *
+     * @param id        当前用户ID
+     * @param commentId 评论ID
+     * @author demiphea
+     */
+    void upVote(@NotNull Long id, @NotNull Long commentId);
+
+    /**
+     * 取消评论点赞
+     *
+     * @param id        当前用户ID
+     * @param commentId 评论ID
+     * @author demiphea
+     */
+    void downVote(@NotNull Long id, @NotNull Long commentId);
 }
