@@ -147,4 +147,21 @@ public class CommentServiceImpl implements CommentService {
         page.close();
         return result;
     }
+
+    @Override
+    public PageResult listSecondComments(@Nullable Long id, @NotNull Long rootId, @NotNull Integer pageNum, @NotNull Integer pageSize) {
+        Page<Object> page = PageHelper.startPage(pageNum, pageSize);
+        List<Comment> comments = commentDao.selectList(new LambdaQueryWrapper<Comment>()
+                .eq(Comment::getRootId, rootId)
+                .orderByDesc(List.of(Comment::getAgreeNum, Comment::getReplyNum, Comment::getCreateTime))
+        );
+        PageInfo<Comment> pageInfo = new PageInfo<>(comments);
+        List<CommentVo> list = comments.stream()
+                .map(comment -> baseService.convert(id, comment))
+                .sorted(comparator)
+                .toList();
+        PageResult result = new PageResult(pageInfo, list);
+        page.close();
+        return result;
+    }
 }

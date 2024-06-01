@@ -126,7 +126,7 @@ public class BaseServiceImpl implements BaseService {
         }
         commentVo.setUser(user);
 
-        if (comment.getParentId() != null) {
+        if (comment.getParentId() != null && !comment.getRootId().equals(comment.getParentId())) {
             Replied replied = new Replied();
             replied.setId(comment.getParentId());
             Comment parent = commentDao.selectById(comment.getParentId());
