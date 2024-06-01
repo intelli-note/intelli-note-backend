@@ -28,7 +28,7 @@ public class Replied {
      * 被回复的评论是否删除
      */
     @JsonProperty("is_deleted")
-    private Boolean deleted;
+    private Boolean deleted = false;
 
     /**
      * 被回复的评论的用户
