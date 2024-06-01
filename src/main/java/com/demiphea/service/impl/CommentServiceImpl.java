@@ -2,6 +2,7 @@ package com.demiphea.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.demiphea.core.CommentComparator;
 import com.demiphea.dao.CommentDao;
 import com.demiphea.entity.Comment;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * CommentServiceImpl
@@ -40,6 +42,26 @@ public class CommentServiceImpl implements CommentService {
     private final CommentDao commentDao;
 
     private final Comparator<CommentVo> comparator = new CommentComparator();
+
+    private String getSimpleText(CommentDto commentDto) {
+        String result = "";
+        if (commentDto.getText() != null) {
+            result += commentDto.getText();
+        }
+        if (commentDto.getImageList() != null && !commentDto.getImageList().isEmpty()) {
+            result += "[图片]";
+        }
+        if (commentDto.getAudio() != null) {
+            result += "[音频]";
+        }
+        if (commentDto.getVideo() != null) {
+            result += "[视频]";
+        }
+        if (commentDto.getLinkNoteId() != null) {
+            result += "[笔记]";
+        }
+        return result;
+    }
 
     @Override
     public CommentVo insertComment(@NotNull Long id, @NotNull CommentDto commentDto) {
@@ -57,22 +79,54 @@ public class CommentServiceImpl implements CommentService {
                 commentDto.getRootId(),
                 commentDto.getParentId(),
                 id,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+
+                0L,
+                0L,
+                getSimpleText(commentDto)
         );
         try {
             commentDao.insert(comment);
         } catch (DataIntegrityViolationException e) {
             throw new CommonServiceException("关联笔记不存在");
         }
+        if (comment.getParentId() != null) {
+            // 刷新父评论的回复数
+            CompletableFuture.runAsync(() -> {
+                Long replyNum = commentDao.selectCount(new LambdaQueryWrapper<Comment>()
+                        .eq(Comment::getParentId, comment.getParentId())
+                );
+                commentDao.update(new LambdaUpdateWrapper<Comment>()
+                        .eq(Comment::getId, comment.getParentId())
+                        .set(Comment::getReplyNum, replyNum)
+                );
+            });
+        }
         return baseService.convert(id, comment);
     }
 
     @Override
     public void deleteComment(@NotNull Long id, @NotNull Long commentId) {
-        if (!permissionService.checkCommentAdminPermission(id, commentId)) {
+        Comment comment = commentDao.selectById(commentId);
+        if (comment == null) {
+            return;
+        }
+        if (!permissionService.checkCommentAdminPermission(id, comment)) {
             throw new PermissionDeniedException("权限拒绝操作");
         }
-        commentDao.deleteById(commentId);
+        commentDao.deleteById(comment);
+        if (comment.getParentId() != null) {
+            // 刷新父评论的回复数
+            CompletableFuture.runAsync(() -> {
+                Long replyNum = commentDao.selectCount(new LambdaQueryWrapper<Comment>()
+                        .eq(Comment::getParentId, comment.getParentId())
+                );
+                commentDao.update(new LambdaUpdateWrapper<Comment>()
+                        .eq(Comment::getId, comment.getParentId())
+                        .set(Comment::getReplyNum, replyNum)
+                );
+            });
+        }
     }
 
     @Override
@@ -82,7 +136,8 @@ public class CommentServiceImpl implements CommentService {
                 .eq(Comment::getNoteId, noteId)
                 .isNull(Comment::getRootId)
                 .isNull(Comment::getParentId)
-                .orderByDesc(Comment::getCreateTime));
+                .orderByDesc(List.of(Comment::getAgreeNum, Comment::getReplyNum, Comment::getCreateTime))
+        );
         PageInfo<Comment> pageInfo = new PageInfo<>(comments);
         List<CommentVo> list = comments.stream()
                 .map(comment -> baseService.convert(id, comment))

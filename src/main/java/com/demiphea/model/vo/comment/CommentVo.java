@@ -24,12 +24,14 @@ public class CommentVo {
     private Long id;
     private UserVo user;
 
+    @JsonProperty("reply_comment")
+    private Replied replied;
+
     private String text;
     @JsonProperty("image_list")
     private List<String> imageList;
     private String audio;
     private String video;
-
     private NoteOverviewVo note;
 
     @JsonProperty("agree_num")

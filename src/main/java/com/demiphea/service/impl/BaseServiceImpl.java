@@ -9,6 +9,7 @@ import com.demiphea.model.vo.collection.CollectionState;
 import com.demiphea.model.vo.collection.CollectionVo;
 import com.demiphea.model.vo.comment.CommentState;
 import com.demiphea.model.vo.comment.CommentVo;
+import com.demiphea.model.vo.comment.Replied;
 import com.demiphea.model.vo.favorite.FavoriteConfiguration;
 import com.demiphea.model.vo.favorite.FavoriteState;
 import com.demiphea.model.vo.favorite.FavoriteVo;
@@ -124,6 +125,25 @@ public class BaseServiceImpl implements BaseService {
             attachState(id, user);
         }
         commentVo.setUser(user);
+
+        if (comment.getParentId() != null) {
+            Replied replied = new Replied();
+            replied.setId(comment.getParentId());
+            Comment parent = commentDao.selectById(comment.getParentId());
+            if (parent == null) {
+                replied.setDeleted(true);
+            } else {
+                UserVo userVo = convert(userDao.selectById(parent.getUserId()));
+                if (id != null) {
+                    attachState(id, userVo);
+                }
+                replied.setUser(userVo);
+                replied.setText(parent.getSimpleText());
+                replied.setCreateTime(parent.getCreateTime());
+            }
+            commentVo.setReplied(replied);
+        }
+
         commentVo.setText(comment.getContent());
         commentVo.setImageList(JSON.parseArray(comment.getImageList(), String.class));
         commentVo.setAudio(comment.getAudio());
@@ -137,13 +157,23 @@ public class BaseServiceImpl implements BaseService {
                 commentVo.setNote(new NoteOverviewVo());
             }
         }
-        Long likeCount = commentLikeDao.selectCount(new LambdaQueryWrapper<CommentLike>().eq(CommentLike::getCommentId, comment.getId()));
+
+        Long likeCount = commentLikeDao.selectCount(new LambdaQueryWrapper<CommentLike>()
+                .eq(CommentLike::getCommentId, comment.getId())
+        );
         commentVo.setAgreeNum(likeCount.toString());
         commentVo.setAgreeNumber(likeCount);
-        Long replyCount = commentDao.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getParentId, comment.getId()));
+        Long replyCount = commentDao.selectCount(new LambdaQueryWrapper<Comment>()
+                .eq(Comment::getParentId, comment.getId())
+        );
         commentVo.setReplyNum(replyCount.toString());
         commentVo.setReplyNumber(replyCount);
+//        commentVo.setAgreeNum(comment.getAgreeNum().toString());
+//        commentVo.setAgreeNumber(comment.getAgreeNum());
+//        commentVo.setReplyNum(comment.getReplyNum().toString());
+//        commentVo.setReplyNumber(comment.getReplyNum());
         commentVo.setCreateTime(comment.getCreateTime());
+
         if (id != null) {
             boolean agreeStatus = commentLikeDao.exists(new LambdaQueryWrapper<CommentLike>()
                     .eq(CommentLike::getCommentId, comment.getId())

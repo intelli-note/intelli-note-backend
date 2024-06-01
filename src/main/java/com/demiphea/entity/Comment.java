@@ -87,4 +87,22 @@ public class Comment {
      */
     @TableField("create_time")
     private LocalDateTime createTime;
+
+    /**
+     * 点赞量
+     */
+    @TableField("agree_num")
+    private Long agreeNum;
+
+    /**
+     * 回复量
+     */
+    @TableField("reply_num")
+    private Long replyNum;
+
+    /**
+     * 评论简单文本表示
+     */
+    @TableField("simple_text")
+    private String simpleText;
 }
