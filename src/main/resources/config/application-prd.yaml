@@ -7,6 +7,12 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
   flyway:
     locations: classpath:database
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    username: "your username"
+    password: "your password"
+    virtual-host: "your virtual-host"
 
 oss:
   access-key: "your access-key"

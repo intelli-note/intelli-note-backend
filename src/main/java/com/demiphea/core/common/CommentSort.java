@@ -1,4 +1,4 @@
-package com.demiphea.core;
+package com.demiphea.core.common;
 
 import ch.obermuhlner.math.big.BigDecimalMath;
 
