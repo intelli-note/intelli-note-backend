@@ -1,0 +1,72 @@
+// 创建Intelli-Note的用户索引表
+PUT /intelli_note_user
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "default_analyzer": {
+          "tokenizer": "ik_max_word",
+          "filter": "default_filter"
+        }
+      },
+      "filter": {
+        "default_filter": {
+          "type": "pinyin",
+          "keep_first_letter": true,
+          "keep_separate_first_letter": true,
+          "limit_first_letter_length": 16,
+          "keep_full_pinyin": true,
+          "keep_joined_full_pinyin": true,
+          "keep_none_chinese": true,
+          "keep_none_chinese_together": true,
+          "keep_none_chinese_in_first_letter": true,
+          "keep_none_chinese_in_joined_full_pinyin": true,
+          "none_chinese_pinyin_tokenize": true,
+          "keep_original": true,
+          "lowercase": true,
+          "trim_whitespace": true,
+          "remove_duplicated_term": true,
+          "ignore_pinyin_offset": true
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      // 用户ID
+      "u_id": {
+        "type": "keyword",
+        "index": true,
+        "copy_to": "summary"
+      },
+      // 用户名
+      "username": {
+        "type": "text",
+        "index": true,
+        "analyzer": "default_analyzer",
+        "search_analyzer": "ik_max_word",
+        "copy_to": "summary"
+      },
+      // 用户简介
+      "biography": {
+        "type": "text",
+        "index": true,
+        "analyzer": "default_analyzer",
+        "search_analyzer": "ik_max_word",
+        "copy_to": "summary"
+      },
+      // 性别
+      "gender": {
+        "type": "keyword",
+        "index": true
+      },
+      // 综合
+      "summary": {
+        "type": "text",
+        "index": true,
+        "analyzer": "default_analyzer",
+        "search_analyzer": "ik_max_word"
+      }
+    }
+  }
+}

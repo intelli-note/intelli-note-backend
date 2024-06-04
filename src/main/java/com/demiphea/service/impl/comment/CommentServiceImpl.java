@@ -1,9 +1,9 @@
-package com.demiphea.service.impl;
+package com.demiphea.service.impl.comment;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.demiphea.core.CommentComparator;
+import com.demiphea.core.common.CommentSort;
 import com.demiphea.dao.CommentDao;
 import com.demiphea.dao.CommentLikeDao;
 import com.demiphea.entity.Comment;
@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -44,7 +45,11 @@ public class CommentServiceImpl implements CommentService {
     private final CommentDao commentDao;
     private final CommentLikeDao commentLikeDao;
 
-    private final Comparator<CommentVo> comparator = new CommentComparator();
+    private final Comparator<CommentVo> comparator = (a, b) -> {
+        BigDecimal aScore = CommentSort.calcScore(a.getAgreeNumber(), a.getReplyNumber(), a.getCreateTime());
+        BigDecimal bScore = CommentSort.calcScore(b.getAgreeNumber(), b.getReplyNumber(), b.getCreateTime());
+        return bScore.compareTo(aScore);
+    };
 
     private String getSimpleText(CommentDto commentDto) {
         String result = "";

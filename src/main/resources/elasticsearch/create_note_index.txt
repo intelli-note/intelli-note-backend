@@ -1,0 +1,98 @@
+// 创建Intelli-Note的笔记索引表
+PUT /intelli_note_note
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "default_analyzer": {
+          "tokenizer": "ik_max_word",
+          "filter": "default_filter"
+        }
+      },
+      "filter": {
+        "default_filter": {
+          "type": "pinyin",
+          "keep_first_letter": true,
+          "keep_separate_first_letter": false,
+          "limit_first_letter_length": 16,
+          "keep_full_pinyin": true,
+          "keep_joined_full_pinyin": true,
+          "keep_none_chinese": true,
+          "keep_none_chinese_together": true,
+          "keep_none_chinese_in_first_letter": true,
+          "keep_none_chinese_in_joined_full_pinyin": true,
+          "none_chinese_pinyin_tokenize": true,
+          "keep_original": true,
+          "lowercase": true,
+          "trim_whitespace": true,
+          "remove_duplicated_term": true,
+          "ignore_pinyin_offset": true
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      // 笔记ID
+      "n_id": {
+        "type": "keyword",
+        "index": true,
+        "copy_to": "summary"
+      },
+      // 标题
+      "title": {
+        "type": "text",
+        "index": true,
+        "analyzer": "default_analyzer",
+        "search_analyzer": "ik_max_word",
+        "copy_to": "summary"
+      },
+      // 内容
+      "content": {
+        "type": "text",
+        "index": true,
+        "analyzer": "default_analyzer",
+        "search_analyzer": "ik_max_word",
+        "copy_to": "summary"
+      },
+      // 作者ID
+      "u_id": {
+        "type": "keyword",
+        "index": true,
+        "copy_to": "summary"
+      },
+      // 作者名称
+      "username": {
+        "type": "text",
+        "index": true,
+        "analyzer": "default_analyzer",
+        "search_analyzer": "ik_max_word",
+        "copy_to": "summary"
+      },
+      // 创建时间
+      "create_time": {
+        "type": "date",
+        "index": true,
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+      // 修改时间
+      "update_time": {
+        "type": "date",
+        "index": true,
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+      // 价格
+      "price": {
+        "type": "double",
+        "index": true
+      },
+      // 综合
+      "summary": {
+        "type": "text",
+        "index": true,
+        "analyzer": "default_analyzer",
+        "search_analyzer": "ik_max_word"
+      }
+    }
+  }
+}
