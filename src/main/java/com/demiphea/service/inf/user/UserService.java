@@ -1,5 +1,6 @@
 package com.demiphea.service.inf.user;
 
+import com.demiphea.model.api.PageResult;
 import com.demiphea.model.dto.user.WalletUpdateDto;
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.UserVo;
@@ -70,4 +71,16 @@ public interface UserService {
      * @author demiphea
      */
     Wallet updateUserWallet(@NotNull Long id, @NotNull WalletUpdateDto update);
+
+    /**
+     * 搜索用户
+     *
+     * @param id       当前用户ID
+     * @param key      关键字
+     * @param pageNum  页码
+     * @param pageSize 每页数量
+     * @return {@link PageResult} 结果
+     * @author demiphea
+     */
+    PageResult searchUsers(@Nullable Long id, @Nullable String key, @NotNull Integer pageNum, @NotNull Integer pageSize);
 }
