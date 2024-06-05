@@ -8,7 +8,8 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 
@@ -20,8 +21,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author demiphea
  * @since 17.0.9
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 //@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 public class HttpUtilsTest {
     private static final String TEST_URL = "https://www.baidu.com";
 

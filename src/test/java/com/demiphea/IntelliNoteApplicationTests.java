@@ -1,11 +1,12 @@
 package com.demiphea;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 //@ActiveProfiles("test")
-//@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockitoExtension.class)
 class IntelliNoteApplicationTests {
 
     @Test
