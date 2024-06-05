@@ -1,4 +1,4 @@
-package com.demiphea.service;
+package com.demiphea.service.impl;
 
 import com.demiphea.entity.es.NoteDoc;
 import com.demiphea.entity.es.UserDoc;

@@ -11,6 +11,7 @@ import com.demiphea.model.dto.favorite.FavoriteDto;
 import com.demiphea.model.po.FavoriteObject;
 import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.service.inf.BaseService;
+import com.demiphea.service.inf.MessageQueueService;
 import com.demiphea.service.inf.PermissionService;
 import com.demiphea.service.inf.favorite.FavoriteService;
 import com.github.pagehelper.Page;
@@ -25,7 +26,6 @@ import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * FavoriteServiceImpl
@@ -43,6 +43,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     private final CollectionDao collectionDao;
     private final NoteFavoriteDao noteFavoriteDao;
     private final CollectionFavoriteDao collectionFavoriteDao;
+    private final MessageQueueService messageQueueService;
 
     /**
      * 取消用户默认收藏夹
@@ -79,32 +80,7 @@ public class FavoriteServiceImpl implements FavoriteService {
         favoriteDao.insert(favorite);
         if (favoriteDto.getFavoriteId() != null) {
             // 异步克隆收藏夹
-            CompletableFuture.runAsync(() -> {
-                Long favoriteId = favoriteDto.getFavoriteId();
-                if (!permissionService.checkFavoriteViewPermission(id, favoriteId)) {
-                    return;
-                }
-                List<Long> noteIds = noteFavoriteDao.selectList(new LambdaQueryWrapper<NoteFavorite>()
-                        .eq(NoteFavorite::getFavoriteId, favoriteId)
-                ).stream().map(NoteFavorite::getNoteId).toList();
-                for (Long noteId : noteIds) {
-                    try {
-                        noteFavoriteDao.insert(new NoteFavorite(null, noteId, favorite.getId(), LocalDateTime.now()));
-                    } catch (Exception e) {
-                        // ignore
-                    }
-                }
-                List<Long> collectionIds = collectionFavoriteDao.selectList(new LambdaQueryWrapper<CollectionFavorite>()
-                        .eq(CollectionFavorite::getFavoriteId, favoriteId)
-                ).stream().map(CollectionFavorite::getCollectionId).toList();
-                for (Long collectionId : collectionIds) {
-                    try {
-                        collectionFavoriteDao.insert(new CollectionFavorite(null, collectionId, favorite.getId(), LocalDateTime.now()));
-                    } catch (Exception e) {
-                        // ignore
-                    }
-                }
-            });
+            messageQueueService.cloneFavorite(id, favoriteDto.getFavoriteId(), favorite.getId());
         }
         return baseService.convert(id, favoriteDao.selectById(favorite.getId()));
     }
