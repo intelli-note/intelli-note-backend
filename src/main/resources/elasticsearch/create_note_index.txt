@@ -13,7 +13,7 @@ PUT /intelli_note_note
         "default_filter": {
           "type": "pinyin",
           "keep_first_letter": true,
-          "keep_separate_first_letter": false,
+          "keep_separate_first_letter": true,
           "limit_first_letter_length": 16,
           "keep_full_pinyin": true,
           "keep_joined_full_pinyin": true,

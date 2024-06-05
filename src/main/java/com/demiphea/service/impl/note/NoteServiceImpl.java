@@ -14,6 +14,7 @@ import com.demiphea.model.bo.user.BillType;
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.model.vo.note.NoteVo;
 import com.demiphea.service.inf.BaseService;
+import com.demiphea.service.inf.MessageQueueService;
 import com.demiphea.service.inf.PermissionService;
 import com.demiphea.service.inf.SystemService;
 import com.demiphea.service.inf.note.NoteService;
@@ -42,6 +43,7 @@ public class NoteServiceImpl implements NoteService {
     private final BaseService baseService;
     private final PermissionService permissionService;
     private final SystemService systemService;
+    private final MessageQueueService messageQueueService;
     private final NoteDao noteDao;
     private final ViewHistoryDao viewHistoryDao;
     private final UserDao userDao;
@@ -54,6 +56,7 @@ public class NoteServiceImpl implements NoteService {
         }
         Note note = new Note(null, title, coverUrl, content, id, LocalDateTime.now(), LocalDateTime.now(), openPublic, price);
         noteDao.insert(note);
+        messageQueueService.saveNoteToES(note);
         return baseService.convert(id, note);
     }
 
@@ -76,7 +79,9 @@ public class NoteServiceImpl implements NoteService {
         note.setPrice(price);
         note.setUpdateTime(LocalDateTime.now());
         noteDao.updateById(note);
-        return baseService.convert(id, noteDao.selectById(noteId));
+        Note newNote = noteDao.selectById(noteId);
+        messageQueueService.saveNoteToES(newNote);
+        return baseService.convert(id, newNote);
     }
 
     @Override
@@ -85,6 +90,7 @@ public class NoteServiceImpl implements NoteService {
             throw new PermissionDeniedException("权限拒绝访问操作");
         }
         noteDao.deleteById(noteId);
+        messageQueueService.deleteNoteInES(noteId);
     }
 
     @Override

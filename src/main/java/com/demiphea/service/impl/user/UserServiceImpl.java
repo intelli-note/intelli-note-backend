@@ -16,6 +16,7 @@ import com.demiphea.model.vo.user.Licence;
 import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.model.vo.user.Wallet;
 import com.demiphea.service.inf.BaseService;
+import com.demiphea.service.inf.MessageQueueService;
 import com.demiphea.service.inf.SystemService;
 import com.demiphea.service.inf.user.UserService;
 import com.demiphea.utils.oss.qiniu.OssUtils;
@@ -43,6 +44,7 @@ import java.net.URISyntaxException;
 public class UserServiceImpl implements UserService {
     private final BaseService baseService;
     private final SystemService systemService;
+    private final MessageQueueService messageQueueService;
     private final UserDao userDao;
 
     @Override
@@ -56,6 +58,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             user = new User(null, "微信用户", Constant.DEFAULT_AVATAR_URL, null, null, openId, BigDecimal.ZERO, BigDecimal.ZERO);
             userDao.insert(user);
+            messageQueueService.saveUserToES(user);
         }
         return new Credential(
                 baseService.convert(user),
@@ -88,6 +91,7 @@ public class UserServiceImpl implements UserService {
             });
         }
         userDao.updateById(user);
+        messageQueueService.saveUserToES(user);
         return baseService.convert(user);
     }
 
