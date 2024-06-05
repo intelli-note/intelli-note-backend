@@ -9,6 +9,7 @@ import com.demiphea.entity.User;
 import com.demiphea.exception.user.BalanceDoesNotEnough;
 import com.demiphea.exception.user.Code2SessionException;
 import com.demiphea.exception.user.UserDoesNotExistException;
+import com.demiphea.model.api.PageResult;
 import com.demiphea.model.bo.user.BillType;
 import com.demiphea.model.dto.user.WalletUpdateDto;
 import com.demiphea.model.vo.user.Credential;
@@ -16,11 +17,15 @@ import com.demiphea.model.vo.user.Licence;
 import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.model.vo.user.Wallet;
 import com.demiphea.service.inf.BaseService;
+import com.demiphea.service.inf.ElasticSearchService;
 import com.demiphea.service.inf.MessageQueueService;
 import com.demiphea.service.inf.SystemService;
 import com.demiphea.service.inf.user.UserService;
 import com.demiphea.utils.oss.qiniu.OssUtils;
 import com.demiphea.utils.wechat.MiniProgramUtils;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.util.List;
 
 /**
  * UserServiceImpl
@@ -46,6 +52,7 @@ public class UserServiceImpl implements UserService {
     private final SystemService systemService;
     private final MessageQueueService messageQueueService;
     private final UserDao userDao;
+    private final ElasticSearchService elasticSearchService;
 
     @Override
     public Credential licence(@NotNull String code) throws URISyntaxException, IOException, ParseException {
@@ -135,5 +142,37 @@ public class UserServiceImpl implements UserService {
         }
         userDao.updateById(user);
         return new Wallet(user.getBalance(), user.getRevenue());
+    }
+
+    @Override
+    public PageResult searchUsers(@Nullable Long id, @Nullable String key, @NotNull Integer pageNum, @NotNull Integer pageSize) {
+        if (key == null || key.isBlank() || key.isEmpty()) {
+            Page<Object> page = PageHelper.startPage(pageNum, pageSize);
+            List<User> users = userDao.selectList(null);
+            PageInfo<User> pageInfo = new PageInfo<>(users);
+            List<UserVo> list = users.stream().map(user -> {
+                UserVo userVo = baseService.convert(user);
+                if (id != null) {
+                    baseService.attachState(id, userVo);
+                }
+                return userVo;
+            }).toList();
+            PageResult result = new PageResult(pageInfo, list);
+            page.close();
+            return result;
+        }
+        List<UserVo> list = elasticSearchService.searchUser(key, pageNum, pageSize).stream()
+                .map(userDoc -> {
+                    User user = userDao.selectById(userDoc.getId());
+                    UserVo userVo = baseService.convert(user);
+                    if (id != null) {
+                        baseService.attachState(id, userVo);
+                    }
+                    return userVo;
+                }).toList();
+        PageInfo<UserVo> pageInfo = new PageInfo<>(list);
+        pageInfo.setPageNum(pageNum);
+        pageInfo.setPageSize(pageSize);
+        return new PageResult(pageInfo, list);
     }
 }

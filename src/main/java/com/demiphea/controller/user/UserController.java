@@ -3,15 +3,18 @@ package com.demiphea.controller.user;
 import com.demiphea.auth.Auth;
 import com.demiphea.auth.AuthID;
 import com.demiphea.model.api.ApiResponse;
+import com.demiphea.model.api.PageResult;
 import com.demiphea.model.vo.user.Credential;
 import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.service.inf.user.UserService;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -74,6 +77,25 @@ public class UserController {
     ) {
         UserVo targetVo = userService.getUserProfile(id, targetId);
         return ApiResponse.success(targetVo);
+    }
+
+    @GetMapping
+    @Auth(block = false)
+    public ApiResponse searchUsers(
+            @AuthID
+            @Nullable
+            Long id,
+            @RequestParam(value = "key", required = false)
+            String key,
+            @RequestParam("page_num")
+            @Min(value = 1, message = "页码需要从1开始")
+            Integer pageNum,
+            @RequestParam("page_size")
+            @Min(value = 1, message = "每页数量必须大于1")
+            Integer pageSize
+    ) {
+        PageResult result = userService.searchUsers(id, key, pageNum, pageSize);
+        return ApiResponse.success(result);
     }
 
 
