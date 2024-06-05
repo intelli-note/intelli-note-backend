@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 /**
  * EditController
  *
@@ -26,7 +28,7 @@ public class EditController {
 
     @PostMapping("/link")
     @Auth
-    public ApiResponse upload(@RequestParam("file") MultipartFile file) {
+    public ApiResponse upload(@RequestParam("file") MultipartFile file) throws IOException {
         String url = editService.upload(file);
         return ApiResponse.success(url);
     }
