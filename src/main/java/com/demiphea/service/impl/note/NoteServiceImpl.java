@@ -1,5 +1,6 @@
 package com.demiphea.service.impl.note;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.demiphea.common.Constant;
 import com.demiphea.dao.NoteDao;
 import com.demiphea.dao.UserDao;
@@ -10,15 +11,17 @@ import com.demiphea.entity.ViewHistory;
 import com.demiphea.exception.common.CommonServiceException;
 import com.demiphea.exception.common.ObjectDoesNotExistException;
 import com.demiphea.exception.common.PermissionDeniedException;
+import com.demiphea.model.api.PageResult;
 import com.demiphea.model.bo.user.BillType;
+import com.demiphea.model.dto.note.QueryTypeDto;
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.model.vo.note.NoteVo;
-import com.demiphea.service.inf.BaseService;
-import com.demiphea.service.inf.MessageQueueService;
-import com.demiphea.service.inf.PermissionService;
-import com.demiphea.service.inf.SystemService;
+import com.demiphea.service.inf.*;
 import com.demiphea.service.inf.note.NoteService;
 import com.demiphea.utils.oss.qiniu.OssUtils;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -47,6 +51,7 @@ public class NoteServiceImpl implements NoteService {
     private final NoteDao noteDao;
     private final ViewHistoryDao viewHistoryDao;
     private final UserDao userDao;
+    private final ElasticSearchService elasticSearchService;
 
     @Override
     public NoteOverviewVo insertNote(@NotNull Long id, @NotNull String title, @Nullable MultipartFile cover, @NotNull String content, @NotNull Boolean openPublic, @NotNull BigDecimal price) throws IOException {
@@ -133,5 +138,100 @@ public class NoteServiceImpl implements NoteService {
         userDao.updateById(user);
         systemService.insertBill(id, BillType.EXPEND, note.getPrice(), noteId);
         return baseService.convert(id, note);
+    }
+
+    @Override
+    public PageResult listNotes(@Nullable Long id, @Nullable QueryTypeDto type, @Nullable Long collectionId, @Nullable String key, @NotNull Integer pageNum, @NotNull Integer pageSize) {
+        if (type == null) {
+            // 查看用户当前笔记
+            if (id == null) {
+                throw new CommonServiceException("请先登录后再查看");
+            }
+            Page<Object> page = PageHelper.startPage(pageNum, pageSize);
+            List<Note> notes = noteDao.selectList(new LambdaQueryWrapper<Note>()
+                    .eq(Note::getUserId, id)
+                    .orderByDesc(Note::getCreateTime)
+                    .orderByDesc(Note::getUpdateTime)
+            );
+            PageInfo<Note> pageInfo = new PageInfo<>(notes);
+            List<NoteOverviewVo> list = notes.stream().map(note -> baseService.convert(id, note)).toList();
+            PageResult result = new PageResult(pageInfo, list);
+            page.close();
+            return result;
+        }
+        switch (type) {
+            case PURCHASE -> {
+                // 查找用户购买笔记
+                if (id == null) {
+                    throw new CommonServiceException("请先登录后再查看");
+                }
+                Page<Object> page = PageHelper.startPage(pageNum, pageSize);
+                List<Note> notes = noteDao.listUserBuy(id);
+                PageInfo<Note> pageInfo = new PageInfo<>(notes);
+                List<NoteOverviewVo> list = notes.stream().map(note -> baseService.convert(id, note)).toList();
+                PageResult result = new PageResult(pageInfo, list);
+                page.close();
+                return result;
+            }
+            case HISTORY -> {
+                // 查看用户笔记浏览记录
+                if (id == null) {
+                    throw new CommonServiceException("请先登录后再查看");
+                }
+                Page<Object> page = PageHelper.startPage(pageNum, pageSize);
+                List<Note> notes = noteDao.listUserView(id);
+                PageInfo<Note> pageInfo = new PageInfo<>(notes);
+                List<NoteOverviewVo> list = notes.stream().map(note -> baseService.convert(id, note)).toList();
+                PageResult result = new PageResult(pageInfo, list);
+                page.close();
+                return result;
+            }
+            case COLLECTION -> {
+                // 查看某一合集中的笔记
+                if (collectionId == null) {
+                    throw new CommonServiceException("请传入合集ID参数");
+                }
+                if (!permissionService.checkCollectionViewPermission(id, collectionId)) {
+                    throw new CommonServiceException("当前合集未公开");
+                }
+                Page<Object> page = PageHelper.startPage(pageNum, pageSize);
+                List<Note> notes = noteDao.listCollectionNotes(id, collectionId);
+                PageInfo<Note> pageInfo = new PageInfo<>(notes);
+                List<NoteOverviewVo> list = notes.stream().map(note -> baseService.convert(id, note)).toList();
+                PageResult result = new PageResult(pageInfo, list);
+                page.close();
+                return result;
+            }
+            case RECOMMEND -> {
+                // 查看推荐的笔记列表
+                Page<Object> page = PageHelper.startPage(pageNum, pageSize);
+                List<Note> notes = noteDao.selectList(new LambdaQueryWrapper<Note>()
+                        .and(w0 -> w0.eq(Note::getOpenPublic, true).or(id != null, w1 -> w1.eq(Note::getUserId, id)))
+                        .orderByDesc(Note::getUpdateTime)
+                        .orderByDesc(Note::getCreateTime)
+                );
+                PageInfo<Note> pageInfo = new PageInfo<>(notes);
+                List<NoteOverviewVo> list = notes.stream().map(note -> baseService.convert(id, note)).toList();
+                PageResult result = new PageResult(pageInfo, list);
+                page.close();
+                return result;
+            }
+            case SEARCH -> {
+                // 搜索笔记
+                if (key == null) {
+                    throw new CommonServiceException("如需搜索，请传入关键词");
+                }
+                List<NoteOverviewVo> list = elasticSearchService.searchNote(key, pageNum, pageSize).stream()
+                        .map(noteDoc -> {
+                            Note note = noteDao.selectById(noteDoc.getId());
+                            return baseService.convert(id, note);
+                        }).toList();
+                PageInfo<NoteOverviewVo> pageInfo = new PageInfo<>(list);
+                pageInfo.setPageNum(pageNum);
+                pageInfo.setPageSize(pageSize);
+                return new PageResult(pageInfo, list);
+            }
+        }
+        return PageResult.EMPTY;
     }
 }

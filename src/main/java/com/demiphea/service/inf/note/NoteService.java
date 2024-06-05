@@ -1,5 +1,7 @@
 package com.demiphea.service.inf.note;
 
+import com.demiphea.model.api.PageResult;
+import com.demiphea.model.dto.note.QueryTypeDto;
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.model.vo.note.NoteVo;
 import org.jetbrains.annotations.NotNull;
@@ -73,4 +75,18 @@ public interface NoteService {
      * @author demiphea
      */
     NoteOverviewVo buyNote(@NotNull Long id, @NotNull Long noteId);
+
+    /**
+     * 分页获取笔记列表
+     *
+     * @param id           当前用户ID
+     * @param type         查询类型
+     * @param collectionId 合集ID
+     * @param key          搜索关键词
+     * @param pageNum      页码
+     * @param pageSize     每页数量
+     * @return {@link PageResult} 结果
+     * @author demiphea
+     */
+    PageResult listNotes(@Nullable Long id, @Nullable QueryTypeDto type, @Nullable Long collectionId, @Nullable String key, @NotNull Integer pageNum, @NotNull Integer pageSize);
 }
