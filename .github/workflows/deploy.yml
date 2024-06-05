@@ -32,8 +32,12 @@ jobs:
       - name: Upload JAR Package And Run
         env:
           PROJECT_NAME: intelli-note
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
           MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          ES_URL: ${{ secrets.ES_URL }}
+          MQ_HOST: ${{ secrets.MQ_HOST }}
           OSS_ACCESS_KEY: ${{ secrets.OSS_ACCESS_KEY }}
           OSS_SECRET_KEY: ${{ secrets.OSS_SECRET_KEY }}
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
@@ -62,5 +66,5 @@ jobs:
           last_ssh: |
             cd ~/${{ env.PROJECT_NAME }}
             PID=$(ps -ef | grep ${{ env.PROJECT_NAME }}.jar | grep -v grep | head -n 1 | awk '{printf $2}'); if [ -n "$PID" ];then kill -9 $PID && echo -e '\033[1;31mThe original Spring Boot Application Process has terminated its execution!\033[0m'; else echo -e '\033[1;33mNo Spring Boot Application Process found!\033[0m'; fi;
-            nohup java -jar ${{ env.PROJECT_NAME }}.jar --spring.profiles.active=prd --spring.datasource.username=$MYSQL_USERNAME --spring.datasource.password=$MYSQL_PASSWORD --oss.access-key=$OSS_ACCESS_KEY --oss.secret-key=$OSS_SECRET_KEY --oss.bucket=$OSS_BUCKET --oss.domain=$OSS_DOMAIN --minio.access-key=$MINIO_ACCESS_KEY --minio.secret-key=$MINIO_SECRET_KEY --minio.endpoint=$MINIO_ENDPOINT --minio.bucket=$MINIO_BUCKET --aliyun.access-key=$ALIYUN_ACCESS_KEY --aliyun.secret-key=$ALIYUN_SECRET_KEY --aliyun.nls.app-key=$ALIYUN_NLS_APP_KEY --mini-program.app-id=$MINI_PROGRAM_APP_ID --mini-program.app-secret=$MINI_PROGRAM_APP_SECRET > ${{ env.PROJECT_NAME }}.log 2>&1 &
+            nohup java -jar ${{ env.PROJECT_NAME }}.jar --spring.profiles.active=prd --spring.datasource.username=$MYSQL_USERNAME --spring.datasource.password=$MYSQL_PASSWORD --spring.elasticsearch.uris=$ES_URL --spring.elasticsearch.username=$USERNAME --spring.elasticsearch.password=$PASSWORD --spring.rabbitmq.host=$MQ_HOST --spring.rabbitmq.username=$USERNAME --spring.rabbitmq.password=$PASSWORD --oss.access-key=$OSS_ACCESS_KEY --oss.secret-key=$OSS_SECRET_KEY --oss.bucket=$OSS_BUCKET --oss.domain=$OSS_DOMAIN --minio.access-key=$MINIO_ACCESS_KEY --minio.secret-key=$MINIO_SECRET_KEY --minio.endpoint=$MINIO_ENDPOINT --minio.bucket=$MINIO_BUCKET --aliyun.access-key=$ALIYUN_ACCESS_KEY --aliyun.secret-key=$ALIYUN_SECRET_KEY --aliyun.nls.app-key=$ALIYUN_NLS_APP_KEY --mini-program.app-id=$MINI_PROGRAM_APP_ID --mini-program.app-secret=$MINI_PROGRAM_APP_SECRET > ${{ env.PROJECT_NAME }}.log 2>&1 &
             

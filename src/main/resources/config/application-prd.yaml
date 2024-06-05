@@ -16,7 +16,7 @@ spring:
     port: 5672
     username: "your username"
     password: "your password"
-    virtual-host: "your virtual-host"
+    virtual-host: "intelli-note" # your rabbitmq virtual host
 
 oss:
   access-key: "your access-key"
