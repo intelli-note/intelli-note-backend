@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * NoteServiceImpl
@@ -109,13 +108,7 @@ public class NoteServiceImpl implements NoteService {
         }
         // 记录阅读历史
         if (id != null) {
-            CompletableFuture.runAsync(() -> {
-                try {
-                    viewHistoryDao.insert(new ViewHistory(id, noteId, LocalDateTime.now()));
-                } catch (Exception e) {
-                    // ignore
-                }
-            });
+            messageQueueService.saveViewHistory(new ViewHistory(id, noteId, LocalDateTime.now()));
         }
         return baseService.pack(id, note);
     }

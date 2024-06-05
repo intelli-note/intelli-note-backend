@@ -2,7 +2,6 @@ package com.demiphea.service.impl.comment;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.demiphea.core.common.CommentSort;
 import com.demiphea.dao.CommentDao;
 import com.demiphea.dao.CommentLikeDao;
@@ -14,6 +13,7 @@ import com.demiphea.model.api.PageResult;
 import com.demiphea.model.dto.comment.CommentDto;
 import com.demiphea.model.vo.comment.CommentVo;
 import com.demiphea.service.inf.BaseService;
+import com.demiphea.service.inf.MessageQueueService;
 import com.demiphea.service.inf.PermissionService;
 import com.demiphea.service.inf.comment.CommentService;
 import com.github.pagehelper.Page;
@@ -29,7 +29,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * CommentServiceImpl
@@ -44,6 +43,7 @@ public class CommentServiceImpl implements CommentService {
     private final PermissionService permissionService;
     private final CommentDao commentDao;
     private final CommentLikeDao commentLikeDao;
+    private final MessageQueueService messageQueueService;
 
     private final Comparator<CommentVo> comparator = (a, b) -> {
         BigDecimal aScore = CommentSort.calcScore(a.getAgreeNumber(), a.getReplyNumber(), a.getCreateTime());
@@ -70,31 +70,6 @@ public class CommentServiceImpl implements CommentService {
         }
         return result;
     }
-
-    private void refreshReplyNum(Long commentId) {
-        CompletableFuture.runAsync(() -> {
-            Long replyNum = commentDao.selectCount(new LambdaQueryWrapper<Comment>()
-                    .eq(Comment::getParentId, commentId)
-            );
-            commentDao.update(new LambdaUpdateWrapper<Comment>()
-                    .eq(Comment::getId, commentId)
-                    .set(Comment::getReplyNum, replyNum)
-            );
-        });
-    }
-
-    private void refreshAgreeNum(Long commentId) {
-        CompletableFuture.runAsync(() -> {
-            Long agreeNum = commentLikeDao.selectCount(new LambdaQueryWrapper<CommentLike>()
-                    .eq(CommentLike::getCommentId, commentId)
-            );
-            commentDao.update(new LambdaUpdateWrapper<Comment>()
-                    .eq(Comment::getId, commentId)
-                    .set(Comment::getAgreeNum, agreeNum)
-            );
-        });
-    }
-
 
     @Override
     public CommentVo insertComment(@NotNull Long id, @NotNull CommentDto commentDto) {
@@ -125,7 +100,7 @@ public class CommentServiceImpl implements CommentService {
         }
         if (comment.getParentId() != null) {
             // 刷新父评论的回复数
-            refreshReplyNum(comment.getParentId());
+            messageQueueService.refreshComment(comment.getParentId());
         }
         return baseService.convert(id, comment);
     }
@@ -142,7 +117,7 @@ public class CommentServiceImpl implements CommentService {
         commentDao.deleteById(comment);
         if (comment.getParentId() != null) {
             // 刷新父评论的回复数
-            refreshReplyNum(comment.getParentId());
+            messageQueueService.refreshComment(comment.getParentId());
         }
     }
 
@@ -191,7 +166,7 @@ public class CommentServiceImpl implements CommentService {
                     id,
                     LocalDateTime.now()
             ));
-            refreshAgreeNum(commentId);
+            messageQueueService.refreshComment(commentId);
         } catch (Exception e) {
             // ignore
         }
@@ -203,6 +178,6 @@ public class CommentServiceImpl implements CommentService {
                 .eq(CommentLike::getCommentId, commentId)
                 .eq(CommentLike::getUserId, id)
         );
-        refreshAgreeNum(commentId);
+        messageQueueService.refreshComment(commentId);
     }
 }
