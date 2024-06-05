@@ -42,6 +42,14 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
 
     @Override
     public List<NoteDoc> searchNote(@NotNull String key, @NotNull Integer pageNum, @NotNull Integer pageSize) {
-        return null;
+        NativeQuery query = NativeQuery.builder()
+                .withQuery(q -> q.match(ma -> ma.field("summary").query(key)))
+                .withPageable(PageRequest.of(pageNum - 1, pageSize))
+                .build();
+        SearchHits<NoteDoc> hits = template.search(query, NoteDoc.class);
+        if (hits.hasSearchHits()) {
+            return new ArrayList<>(hits.getSearchHits().stream().map(SearchHit::getContent).toList());
+        }
+        return Collections.emptyList();
     }
 }
