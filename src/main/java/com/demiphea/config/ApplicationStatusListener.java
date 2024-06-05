@@ -3,6 +3,7 @@ package com.demiphea.config;
 import com.alibaba.nls.client.AccessToken;
 import com.aliyun.ocr_api20210707.Client;
 import com.aliyun.teaopenapi.models.Config;
+import com.demiphea.service.inf.MessageQueueService;
 import com.demiphea.utils.aliyun.AliyunProfile;
 import com.demiphea.utils.aliyun.nls.FileTransUtil;
 import com.demiphea.utils.aliyun.nls.NLSProfile;
@@ -47,6 +48,7 @@ public class ApplicationStatusListener {
     private final NLSProfile nlsProfile;
     private final MinioProfile minioProfile;
     private final MiniProgramProfile miniProgramProfile;
+    private final MessageQueueService messageQueueService;
 
     @PostConstruct
     private void postApplicationStart() throws Exception {
@@ -56,13 +58,14 @@ public class ApplicationStatusListener {
         initAliyunNLSUtils();
         initAliyunOCRUtils();
         initMiniProgramUtils();
+
+        syncES();
     }
 
     @PreDestroy
     private void preApplicationDestroy() throws Exception {
         destroyMinioUtils();
         destroyHttpUtils();
-
     }
 
     private void initOssUtils() {
@@ -161,5 +164,9 @@ public class ApplicationStatusListener {
         CommonReflectionUtils.setStaticFieldValue(clazz,
                 "appSecret", miniProgramProfile.getAppSecret()
         );
+    }
+
+    private void syncES() {
+        messageQueueService.syncES();
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.Objects;
+
 /**
  * UserDoc
  *
@@ -72,4 +74,17 @@ public class UserDoc {
             index = true
     )
     private String gender;
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof UserDoc obj)) {
+            return false;
+        }
+        return (Objects.equals(this.id, obj.id)) &&
+                (Objects.equals(this.uId, obj.uId)) &&
+                (Objects.equals(this.username, obj.username)) &&
+                (Objects.equals(this.biography, obj.biography)) &&
+                (Objects.equals(this.gender, obj.gender));
+    }
+
 }

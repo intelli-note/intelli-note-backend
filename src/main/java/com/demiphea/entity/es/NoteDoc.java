@@ -11,6 +11,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * NoteDoc
@@ -31,6 +32,17 @@ public class NoteDoc {
 
     /**
      * 笔记ID
+     */
+    @Field(
+            name = "n_id",
+            type = FieldType.Keyword,
+            index = true,
+            copyTo = "summary"
+    )
+    private Long nId;
+
+    /**
+     * 标题
      */
     @Field(
             name = "title",
@@ -112,4 +124,20 @@ public class NoteDoc {
             index = true
     )
     private BigDecimal price;
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof NoteDoc obj)) {
+            return false;
+        }
+        return (Objects.equals(this.id, obj.id)) &&
+                (Objects.equals(this.nId, obj.nId)) &&
+                (Objects.equals(this.title, obj.title)) &&
+                (Objects.equals(this.content, obj.content)) &&
+                (Objects.equals(this.userId, obj.userId)) &&
+                (Objects.equals(this.username, obj.username)) &&
+                (Objects.equals(this.createTime, obj.createTime)) &&
+                (Objects.equals(this.updateTime, obj.updateTime)) &&
+                (Objects.equals(this.price.doubleValue(), obj.price.doubleValue()));
+    }
 }
