@@ -39,10 +39,6 @@ public class FollowServiceImpl implements FollowService {
         Follow follow = new Follow(null, id, targetId, LocalDateTime.now());
         try {
             followDao.insert(follow);
-        } catch (Exception e) {
-            // ignore
-        }
-        try {
             systemService.publishNotice(NoticeType.FOLLOW, follow.getId());
         } catch (Exception e) {
             // ignore
