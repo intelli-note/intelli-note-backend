@@ -31,7 +31,7 @@ public class SystemServiceImpl implements SystemService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void insertBill(@NotNull Long userId, @NotNull BillType type, @NotNull BigDecimal amount, @Nullable Long noteId) {
+    public Long insertBill(@NotNull Long userId, @NotNull BillType type, @NotNull BigDecimal amount, @Nullable Long noteId) {
         Bill bill = new Bill(
                 null,
                 type.ordinal(),
@@ -42,10 +42,15 @@ public class SystemServiceImpl implements SystemService {
                 false
         );
         billDao.insert(bill);
+        return bill.getId();
     }
 
     @Override
     public void publishNotice(@NotNull NoticeType type, @NotNull Long linkId) {
-        template.convertAndSend(ServiceListener.EXCHANGE_NAME, "notice.publish", new NoticeBo(type, linkId));
+        try {
+            template.convertAndSend(ServiceListener.EXCHANGE_NAME, "notice.publish", new NoticeBo(type, linkId));
+        } catch (Exception e) {
+            // ignore
+        }
     }
 }

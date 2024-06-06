@@ -7,12 +7,14 @@ import com.demiphea.exception.common.CommonServiceException;
 import com.demiphea.exception.common.ObjectDoesNotExistException;
 import com.demiphea.exception.common.PermissionDeniedException;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.bo.notice.NoticeType;
 import com.demiphea.model.dto.favorite.FavoriteDto;
 import com.demiphea.model.po.FavoriteObject;
 import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.service.inf.BaseService;
 import com.demiphea.service.inf.MessageQueueService;
 import com.demiphea.service.inf.PermissionService;
+import com.demiphea.service.inf.SystemService;
 import com.demiphea.service.inf.favorite.FavoriteService;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -44,6 +46,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     private final NoteFavoriteDao noteFavoriteDao;
     private final CollectionFavoriteDao collectionFavoriteDao;
     private final MessageQueueService messageQueueService;
+    private final SystemService systemService;
 
     /**
      * 取消用户默认收藏夹
@@ -153,7 +156,9 @@ public class FavoriteServiceImpl implements FavoriteService {
                         continue;
                     }
                     try {
-                        count += noteFavoriteDao.insert(new NoteFavorite(null, noteId, favoriteId, LocalDateTime.now()));
+                        NoteFavorite entity = new NoteFavorite(null, noteId, favoriteId, LocalDateTime.now());
+                        count += noteFavoriteDao.insert(entity);
+                        systemService.publishNotice(NoticeType.NOTE_STAR, entity.getId());
                     } catch (Exception e) {
                         // ignore
                     }
@@ -176,7 +181,9 @@ public class FavoriteServiceImpl implements FavoriteService {
                         continue;
                     }
                     try {
-                        count += collectionFavoriteDao.insert(new CollectionFavorite(null, collectionId, favoriteId, LocalDateTime.now()));
+                        CollectionFavorite entity = new CollectionFavorite(null, collectionId, favoriteId, LocalDateTime.now());
+                        count += collectionFavoriteDao.insert(entity);
+                        systemService.publishNotice(NoticeType.COLLECTION_STAR, entity.getId());
                     } catch (Exception e) {
                         // ignore
                     }
