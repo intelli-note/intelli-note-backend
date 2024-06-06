@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.demiphea.dao.*;
 import com.demiphea.entity.*;
+import com.demiphea.model.bo.notice.NoticeBo;
 import com.demiphea.model.dto.favorite.FavoriteCloneDto;
 import com.demiphea.service.inf.PermissionService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,40 @@ public class ServiceListener {
     private final CollectionFavoriteDao collectionFavoriteDao;
     private final CommentDao commentDao;
     private final CommentLikeDao commentLikeDao;
+    private final NoticeDao noticeDao;
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue("notice::publish"),
+            exchange = @Exchange(value = EXCHANGE_NAME, type = ExchangeTypes.TOPIC),
+            key = "notice.publish"
+    ))
+    public void publishNotice(@NotNull NoticeBo noticeBo) {
+        Notice notice = new Notice();
+        notice.setType(noticeBo.getType().type);
+        switch (noticeBo.getType()) {
+            case FOLLOW -> notice.setLinkFollowId(noticeBo.getLinkId());
+            case NOTE_STAR -> notice.setLinkStarNoteId(noticeBo.getLinkId());
+            case COLLECTION_STAR -> notice.setLinkStarCollectionId(noticeBo.getLinkId());
+            case COMMENT -> notice.setLinkCommentId(noticeBo.getLinkId());
+            case LIKE -> notice.setLinkCommentLikeId(noticeBo.getLinkId());
+            case TRADE -> notice.setLinkBillId(noticeBo.getLinkId());
+//            case ALL -> throw new CommonServiceException("不支持的通知类别");
+            case ALL -> {
+                return;
+            }
+        }
+        notice.setUserId(noticeBo.getUserId());
+        notice.setCreateTime(LocalDateTime.now());
+        notice.setRead(false);
+        try {
+            noticeDao.insert(notice);
+        } catch (Exception e) {
+            // ignore
+        }
+
+        // TODO: websocket发送消息
+
+    }
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue("view_history::save"),

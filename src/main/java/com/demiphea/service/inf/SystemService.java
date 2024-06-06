@@ -1,5 +1,6 @@
 package com.demiphea.service.inf;
 
+import com.demiphea.model.bo.notice.NoticeType;
 import com.demiphea.model.bo.user.BillType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,4 +24,14 @@ public interface SystemService {
      * @author demiphea
      */
     void insertBill(@NotNull Long userId, @NotNull BillType type, @NotNull BigDecimal amount, @Nullable Long noteId);
+
+    /**
+     * 发送通知（系统调用）
+     *
+     * @param type   通知类型（不支持{@link NoticeType#ALL}）
+     * @param linkId 关联ID
+     * @param userId 用户ID
+     * @author demiphea
+     */
+    void publishNotice(@NotNull NoticeType type, @NotNull Long linkId, @NotNull Long userId);
 }

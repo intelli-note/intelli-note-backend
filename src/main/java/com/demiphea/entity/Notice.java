@@ -32,7 +32,7 @@ public class Notice {
      * 通知类型：0-关注通知，1-收藏通知，2-评论通知，3-点赞通知，4-交易通知
      */
     @TableField("type")
-    private Long type;
+    private Integer type;
 
     /**
      * 关联关注表ID，可选
@@ -86,5 +86,5 @@ public class Notice {
      * 是否已读
      */
     @TableField("is_read")
-    private Boolean read;
+    private Boolean read = false;
 }

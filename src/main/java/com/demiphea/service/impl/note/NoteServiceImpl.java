@@ -123,6 +123,7 @@ public class NoteServiceImpl implements NoteService {
         if (note == null) {
             throw new ObjectDoesNotExistException("笔记不存在或已删除");
         }
+        // buyer
         User user = userDao.selectById(id);
         if (user.getBalance().compareTo(note.getPrice()) < 0) {
             throw new CommonServiceException("余额不足，请充值");
@@ -130,6 +131,14 @@ public class NoteServiceImpl implements NoteService {
         user.setBalance(user.getBalance().subtract(note.getPrice()));
         userDao.updateById(user);
         systemService.insertBill(id, BillType.EXPEND, note.getPrice(), noteId);
+
+        // seller
+        User author = userDao.selectById(note.getUserId());
+        author.setBalance(user.getBalance().add(note.getPrice()));
+        author.setRevenue(user.getRevenue().add(note.getPrice()));
+        userDao.updateById(author);
+        systemService.insertBill(note.getUserId(), BillType.INCOME, note.getPrice(), noteId);
+
         return baseService.convert(id, note);
     }
 
