@@ -1,12 +1,16 @@
 package com.demiphea.core.mq;
 
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.demiphea.dao.*;
 import com.demiphea.entity.*;
 import com.demiphea.model.bo.notice.NoticeBo;
 import com.demiphea.model.dto.favorite.FavoriteCloneDto;
+import com.demiphea.model.vo.notice.NoticeVo;
+import com.demiphea.service.inf.BaseService;
 import com.demiphea.service.inf.PermissionService;
+import com.demiphea.websocket.NoticeWebsocket;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +20,8 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +38,8 @@ import java.util.List;
 public class ServiceListener {
     public static final String EXCHANGE_NAME = "service_module";
 
+    private final BaseService baseService;
+
     private final ViewHistoryDao viewHistoryDao;
     private final PermissionService permissionService;
     private final CommentDao commentDao;
@@ -40,7 +48,6 @@ public class ServiceListener {
     private final NoteDao noteDao;
     private final CollectionDao collectionDao;
     private final BillDao billDao;
-    private final UserDao userDao;
     private final FollowDao followDao;
     private final NoteFavoriteDao noteFavoriteDao;
     private final CollectionFavoriteDao collectionFavoriteDao;
@@ -124,8 +131,16 @@ public class ServiceListener {
         } catch (Exception e) {
             // ignore
         }
-        // TODO: websocket发送消息
-
+        // 发送消息通知
+        try {
+            WebSocketSession session = NoticeWebsocket.POOL.get(targetId);
+            if (session != null) {
+                NoticeVo noticeVo = baseService.convert(targetId, notice);
+                session.sendMessage(new TextMessage(JSON.toJSONString(noticeVo)));
+            }
+        } catch (Exception e) {
+            // ignore
+        }
     }
 
     @RabbitListener(bindings = @QueueBinding(
