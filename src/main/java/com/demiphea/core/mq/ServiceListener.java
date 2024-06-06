@@ -1,6 +1,5 @@
 package com.demiphea.core.mq;
 
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.demiphea.dao.*;
@@ -11,6 +10,7 @@ import com.demiphea.model.vo.notice.NoticeVo;
 import com.demiphea.service.inf.BaseService;
 import com.demiphea.service.inf.PermissionService;
 import com.demiphea.websocket.NoticeWebsocket;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +51,8 @@ public class ServiceListener {
     private final FollowDao followDao;
     private final NoteFavoriteDao noteFavoriteDao;
     private final CollectionFavoriteDao collectionFavoriteDao;
+
+    private final ObjectMapper objectMapper;
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue("notice::publish"),
@@ -136,7 +138,7 @@ public class ServiceListener {
             WebSocketSession session = NoticeWebsocket.POOL.get(targetId);
             if (session != null) {
                 NoticeVo noticeVo = baseService.convert(targetId, notice);
-                session.sendMessage(new TextMessage(JSON.toJSONString(noticeVo)));
+                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(noticeVo)));
             }
         } catch (Exception e) {
             // ignore
