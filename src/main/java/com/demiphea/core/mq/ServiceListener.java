@@ -73,7 +73,13 @@ public class ServiceListener {
             case COMMENT -> {
                 notice.setLinkCommentId(noticeBo.getLinkId());
                 Comment comment = commentDao.selectById(noticeBo.getLinkId());
-                targetId = commentDao.selectById(comment.getParentId()).getUserId();
+                if (comment.getParentId() == null) {
+                    // 根评论，通知目标为笔记作者
+                    targetId = noteDao.selectById(comment.getNoteId()).getUserId();
+                } else {
+                    // 非根评论，通知目标为父评论用户
+                    targetId = commentDao.selectById(comment.getParentId()).getUserId();
+                }
             }
             case LIKE -> {
                 notice.setLinkCommentLikeId(noticeBo.getLinkId());
@@ -82,7 +88,7 @@ public class ServiceListener {
             }
             case TRADE -> {
                 notice.setLinkBillId(noticeBo.getLinkId());
-                Bill bill = billDao.selectById(noticeBo.getLinkId());
+                Bill bill = billDao.selectByIdWithDeleted(noticeBo.getLinkId());
                 targetId = bill.getUserId();
             }
 //            case ALL -> throw new CommonServiceException("不支持的通知类别");
@@ -98,7 +104,6 @@ public class ServiceListener {
         } catch (Exception e) {
             // ignore
         }
-
         // TODO: websocket发送消息
 
     }
