@@ -6,6 +6,7 @@ import com.demiphea.model.vo.comment.CommentVo;
 import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.model.vo.note.NoteOverviewVo;
 import com.demiphea.model.vo.note.NoteVo;
+import com.demiphea.model.vo.notice.NoticeVo;
 import com.demiphea.model.vo.user.BillVo;
 import com.demiphea.model.vo.user.UserVo;
 import org.jetbrains.annotations.NotNull;
@@ -56,6 +57,16 @@ public interface BaseService {
      * @author demiphea
      */
     CommentVo convert(@Nullable Long id, @NotNull Comment comment);
+
+    /**
+     * 通知转换
+     *
+     * @param id     当前用户ID
+     * @param notice 通知
+     * @return {@link NoticeVo} 通知VO
+     * @author demiphea
+     */
+    NoticeVo convert(@Nullable Long id, @NotNull Notice notice);
 
     /**
      * 笔记打包

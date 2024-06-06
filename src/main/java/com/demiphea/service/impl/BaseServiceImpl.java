@@ -4,6 +4,8 @@ import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.demiphea.dao.*;
 import com.demiphea.entity.*;
+import com.demiphea.exception.common.CommonServiceException;
+import com.demiphea.model.bo.notice.NoticeType;
 import com.demiphea.model.vo.collection.CollectionConfiguration;
 import com.demiphea.model.vo.collection.CollectionState;
 import com.demiphea.model.vo.collection.CollectionVo;
@@ -14,6 +16,7 @@ import com.demiphea.model.vo.favorite.FavoriteConfiguration;
 import com.demiphea.model.vo.favorite.FavoriteState;
 import com.demiphea.model.vo.favorite.FavoriteVo;
 import com.demiphea.model.vo.note.*;
+import com.demiphea.model.vo.notice.*;
 import com.demiphea.model.vo.user.BillVo;
 import com.demiphea.model.vo.user.UserState;
 import com.demiphea.model.vo.user.UserVo;
@@ -23,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -44,6 +49,8 @@ public class BaseServiceImpl implements BaseService {
     private final CollectionFavoriteDao collectionFavoriteDao;
     private final NoteCollectDao noteCollectDao;
     private final CommentLikeDao commentLikeDao;
+    private final CollectionDao collectionDao;
+    private final BillDao billDao;
 
     @Override
     public UserVo convert(@NotNull User user) {
@@ -181,6 +188,137 @@ public class BaseServiceImpl implements BaseService {
             commentVo.setState(new CommentState(agreeStatus, id.equals(comment.getUserId())));
         }
         return commentVo;
+    }
+
+    private List<Comment> traceComments(Comment comment) {
+        Deque<Comment> deque = new ArrayDeque<>();
+        // 追溯上游评论
+        Comment ptr = comment;
+        while (ptr.getParentId() != null) {
+            deque.push(ptr);
+            ptr = commentDao.selectById(ptr.getParentId());
+        }
+        deque.push(ptr);
+        // 追溯下游评论
+        // ...
+        return deque.stream().toList();
+    }
+
+    @Override
+    public NoticeVo convert(@Nullable Long id, @NotNull Notice notice) {
+        NoticeVo noticeVo = new NoticeVo();
+        noticeVo.setId(notice.getId());
+        switch (notice.getType()) {
+            case 0 -> {
+                if (notice.getLinkFollowId() == null) {
+                    throw new CommonServiceException("转换出错：通知类型与对象不匹配");
+                }
+                noticeVo.setType(NoticeType.FOLLOW);
+                FollowNotice iNotice = new FollowNotice();
+                Follow follow = followDao.selectById(notice.getLinkFollowId());
+                UserVo followerVo = convert(userDao.selectById(follow.getFollowerId()));
+                if (id != null) {
+                    attachState(id, followerVo);
+                }
+                iNotice.setFollower(followerVo);
+                iNotice.setFollowTime(follow.getCreateTime());
+                noticeVo.setNotice(iNotice);
+            }
+            case 1 -> {
+                if (notice.getLinkStarNoteId() == null && notice.getLinkStarCollectionId() == null
+                        || notice.getLinkStarNoteId() != null && notice.getLinkStarCollectionId() != null) {
+                    throw new CommonServiceException("转换出错：通知类型与对象不匹配");
+                }
+                StarNotice iNotice = new StarNotice();
+                if (notice.getLinkStarNoteId() != null) {
+                    noticeVo.setType(NoticeType.NOTE_STAR);
+                    NoteFavorite noteFavorite = noteFavoriteDao.selectById(notice.getLinkStarNoteId());
+                    User user = userDao.selectById(
+                            favoriteDao.selectById(noteFavorite.getFavoriteId()).getUserId()
+                    );
+                    UserVo userVo = convert(user);
+                    if (id != null) {
+                        attachState(id, userVo);
+                    }
+                    iNotice.setUser(userVo);
+                    iNotice.setType(StarNotice.Type.NOTE);
+                    Note note = noteDao.selectById(noteFavorite.getNoteId());
+                    iNotice.setNote(convert(id, note));
+                    iNotice.setCollection(null);
+                    iNotice.setStarTime(noteFavorite.getCreateTime());
+                }
+                if (notice.getLinkStarCollectionId() != null) {
+                    noticeVo.setType(NoticeType.COLLECTION_STAR);
+                    CollectionFavorite collectionFavorite = collectionFavoriteDao.selectById(notice.getLinkStarCollectionId());
+                    User user = userDao.selectById(
+                            favoriteDao.selectById(collectionFavorite.getFavoriteId()).getUserId()
+                    );
+                    UserVo userVo = convert(user);
+                    if (id != null) {
+                        attachState(id, userVo);
+                    }
+                    iNotice.setUser(userVo);
+                    iNotice.setType(StarNotice.Type.COLLECTION);
+                    iNotice.setNote(null);
+                    Collection collection = collectionDao.selectById(collectionFavorite.getCollectionId());
+                    iNotice.setCollection(convert(id, collection));
+                    iNotice.setStarTime(collectionFavorite.getCreateTime());
+                }
+                noticeVo.setNotice(iNotice);
+            }
+            case 2 -> {
+                if (notice.getLinkCommentId() == null) {
+                    throw new CommonServiceException("转换出错：通知类型与对象不匹配");
+                }
+                noticeVo.setType(NoticeType.COMMENT);
+                CommentNotice iNotice = new CommentNotice();
+                iNotice.setType(CommentNotice.Type.REPLY);
+                Comment comment = commentDao.selectById(notice.getLinkCommentId());
+                Note note = noteDao.selectById(comment.getNoteId());
+                iNotice.setNote(convert(id, note));
+                iNotice.setTarget(convert(id, comment));
+                iNotice.setContext(traceComments(comment).stream().map(c -> convert(id, c)).toList());
+                noticeVo.setNotice(iNotice);
+            }
+            case 3 -> {
+                if (notice.getLinkCommentLikeId() == null) {
+                    throw new CommonServiceException("转换出错：通知类型与对象不匹配");
+                }
+                noticeVo.setType(NoticeType.LIKE);
+                CommentNotice iNotice = new CommentNotice();
+                iNotice.setType(CommentNotice.Type.LIKE);
+                CommentLike commentLike = commentLikeDao.selectById(notice.getLinkCommentLikeId());
+                Comment comment = commentDao.selectById(commentLike.getCommentId());
+                Note note = noteDao.selectById(
+                        comment.getNoteId()
+                );
+                iNotice.setNote(convert(id, note));
+                iNotice.setTarget(convert(id, comment));
+                iNotice.setContext(traceComments(comment).stream().map(c -> convert(id, c)).toList());
+                User liker = userDao.selectById(commentLike.getUserId());
+                UserVo likerVo = convert(liker);
+                if (id != null) {
+                    attachState(id, likerVo);
+                }
+                iNotice.setLiker(likerVo);
+                iNotice.setLikeTime(commentLike.getCreateTime());
+                noticeVo.setNotice(iNotice);
+            }
+            case 4 -> {
+                if (notice.getLinkBillId() == null) {
+                    throw new CommonServiceException("转换出错：通知类型与对象不匹配");
+                }
+                noticeVo.setType(NoticeType.TRADE);
+                BillNotice iNotice = new BillNotice();
+                Bill bill = billDao.selectById(notice.getLinkBillId());
+                iNotice.setBill(convert(id, bill));
+                noticeVo.setNotice(iNotice);
+            }
+            default -> throw new CommonServiceException("转换出错：无法识别的通知类型");
+        }
+        noticeVo.setTime(notice.getCreateTime());
+        noticeVo.setRead(notice.getRead());
+        return noticeVo;
     }
 
     @Override
