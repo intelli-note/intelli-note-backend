@@ -158,7 +158,7 @@ public class FavoriteServiceImpl implements FavoriteService {
                     try {
                         NoteFavorite entity = new NoteFavorite(null, noteId, favoriteId, LocalDateTime.now());
                         count += noteFavoriteDao.insert(entity);
-                        systemService.publishNotice(NoticeType.NOTE_STAR, entity.getId());
+                        systemService.publishNotice(id, NoticeType.NOTE_STAR, entity.getId());
                     } catch (Exception e) {
                         // ignore
                     }
@@ -183,7 +183,7 @@ public class FavoriteServiceImpl implements FavoriteService {
                     try {
                         CollectionFavorite entity = new CollectionFavorite(null, collectionId, favoriteId, LocalDateTime.now());
                         count += collectionFavoriteDao.insert(entity);
-                        systemService.publishNotice(NoticeType.COLLECTION_STAR, entity.getId());
+                        systemService.publishNotice(id, NoticeType.COLLECTION_STAR, entity.getId());
                     } catch (Exception e) {
                         // ignore
                     }

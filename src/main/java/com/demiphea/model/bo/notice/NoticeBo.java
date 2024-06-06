@@ -16,6 +16,11 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public class NoticeBo {
     /**
+     * 触发通知的用户ID
+     */
+    @NotNull
+    private Long userId;
+    /**
      * 通知类型（不支持{@link NoticeType#ALL}）
      */
     @NotNull

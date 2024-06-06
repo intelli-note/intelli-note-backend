@@ -140,8 +140,8 @@ public class NoteServiceImpl implements NoteService {
         userDao.updateById(author);
         Long sellerBillId = systemService.insertBill(note.getUserId(), BillType.INCOME, note.getPrice(), noteId);
 
-        systemService.publishNotice(NoticeType.TRADE, buyerBillId);
-        systemService.publishNotice(NoticeType.TRADE, sellerBillId);
+        systemService.publishNotice(id, NoticeType.TRADE, buyerBillId);
+        systemService.publishNotice(id, NoticeType.TRADE, sellerBillId);
 
         return baseService.convert(id, note);
     }

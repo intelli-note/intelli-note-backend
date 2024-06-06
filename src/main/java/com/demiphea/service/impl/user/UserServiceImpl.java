@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService {
             case IN -> {
                 user.setBalance(user.getBalance().add(delta));
                 Long billId = systemService.insertBill(id, BillType.DEPOSIT, delta, null);
-                systemService.publishNotice(NoticeType.TRADE, billId);
+                systemService.publishNotice(id, NoticeType.TRADE, billId);
             }
             case OUT -> {
                 if (user.getBalance().compareTo(delta) < 0) {
@@ -140,7 +140,7 @@ public class UserServiceImpl implements UserService {
                 }
                 user.setBalance(user.getBalance().subtract(delta));
                 Long billId = systemService.insertBill(id, BillType.WITHDRAW, delta, null);
-                systemService.publishNotice(NoticeType.TRADE, billId);
+                systemService.publishNotice(id, NoticeType.TRADE, billId);
             }
         }
         userDao.updateById(user);
