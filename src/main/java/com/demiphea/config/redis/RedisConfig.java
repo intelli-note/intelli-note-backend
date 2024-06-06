@@ -3,6 +3,7 @@ package com.demiphea.config.redis;
 import com.alibaba.fastjson2.support.spring6.data.redis.GenericFastJsonRedisSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 @Configuration
 public class RedisConfig {
     @Bean
+    @Primary
     public RedisTemplate redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
