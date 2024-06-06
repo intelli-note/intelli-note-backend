@@ -105,7 +105,7 @@ public class CommentServiceImpl implements CommentService {
             // 刷新父评论的回复数
             messageQueueService.refreshComment(comment.getParentId());
         }
-        systemService.publishNotice(NoticeType.COMMENT, comment.getId());
+        systemService.publishNotice(id, NoticeType.COMMENT, comment.getId());
         return baseService.convert(id, comment);
     }
 
@@ -172,7 +172,7 @@ public class CommentServiceImpl implements CommentService {
             );
             commentLikeDao.insert(entity);
             messageQueueService.refreshComment(commentId);
-            systemService.publishNotice(NoticeType.LIKE, entity.getId());
+            systemService.publishNotice(id, NoticeType.LIKE, entity.getId());
         } catch (Exception e) {
             // ignore
         }

@@ -59,16 +59,28 @@ public class ServiceListener {
                 notice.setLinkFollowId(noticeBo.getLinkId());
                 Follow follow = followDao.selectById(noticeBo.getLinkId());
                 targetId = follow.getFollowId();
+                if (targetId.equals(noticeBo.getUserId())) {
+                    // 如果通知触发的用户和接收通知的用户是同一个，则不发送通知
+                    return;
+                }
             }
             case NOTE_STAR -> {
                 notice.setLinkStarNoteId(noticeBo.getLinkId());
                 NoteFavorite noteFavorite = noteFavoriteDao.selectById(noticeBo.getLinkId());
                 targetId = noteDao.selectById(noteFavorite.getNoteId()).getUserId();
+                if (targetId.equals(noticeBo.getUserId())) {
+                    // 如果通知触发的用户和接收通知的用户是同一个，则不发送通知
+                    return;
+                }
             }
             case COLLECTION_STAR -> {
                 notice.setLinkStarCollectionId(noticeBo.getLinkId());
                 CollectionFavorite collectionFavorite = collectionFavoriteDao.selectById(noticeBo.getLinkId());
                 targetId = collectionDao.selectById(collectionFavorite.getCollectionId()).getUserId();
+                if (targetId.equals(noticeBo.getUserId())) {
+                    // 如果通知触发的用户和接收通知的用户是同一个，则不发送通知
+                    return;
+                }
             }
             case COMMENT -> {
                 notice.setLinkCommentId(noticeBo.getLinkId());
@@ -80,11 +92,19 @@ public class ServiceListener {
                     // 非根评论，通知目标为父评论用户
                     targetId = commentDao.selectById(comment.getParentId()).getUserId();
                 }
+                if (targetId.equals(noticeBo.getUserId())) {
+                    // 如果通知触发的用户和接收通知的用户是同一个，则不发送通知
+                    return;
+                }
             }
             case LIKE -> {
                 notice.setLinkCommentLikeId(noticeBo.getLinkId());
                 CommentLike commentLike = commentLikeDao.selectById(noticeBo.getLinkId());
                 targetId = commentDao.selectById(commentLike.getCommentId()).getUserId();
+                if (targetId.equals(noticeBo.getUserId())) {
+                    // 如果通知触发的用户和接收通知的用户是同一个，则不发送通知
+                    return;
+                }
             }
             case TRADE -> {
                 notice.setLinkBillId(noticeBo.getLinkId());

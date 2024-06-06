@@ -29,9 +29,10 @@ public interface SystemService {
     /**
      * 发送通知（系统调用）
      *
+     * @param userId 触发用户ID
      * @param type   通知类型（不支持{@link NoticeType#ALL}）
      * @param linkId 关联ID
      * @author demiphea
      */
-    void publishNotice(@NotNull NoticeType type, @NotNull Long linkId);
+    void publishNotice(@NotNull Long userId, @NotNull NoticeType type, @NotNull Long linkId);
 }
