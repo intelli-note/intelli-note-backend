@@ -59,7 +59,7 @@ public class StarNotice implements INotice {
          */
         COLLECTION(1),
         ;
-        @JsonProperty
+
         public final int type;
 
         Type(int type) {

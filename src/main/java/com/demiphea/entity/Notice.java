@@ -85,6 +85,6 @@ public class Notice {
     /**
      * 是否已读
      */
-    @TableField("is_read")
-    private Boolean read = false;
+    @TableField("read_tick")
+    private Boolean readTick;
 }

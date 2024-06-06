@@ -317,7 +317,7 @@ public class BaseServiceImpl implements BaseService {
             default -> throw new CommonServiceException("转换出错：无法识别的通知类型");
         }
         noticeVo.setTime(notice.getCreateTime());
-        noticeVo.setRead(notice.getRead());
+        noticeVo.setRead(notice.getReadTick());
         return noticeVo;
     }
 

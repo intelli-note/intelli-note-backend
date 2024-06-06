@@ -173,4 +173,24 @@ public interface PermissionService {
      */
     boolean checkFavoriteViewPermission(@Nullable Long id, @NotNull Favorite favorite);
 
+    /**
+     * 校验通知管理权限
+     *
+     * @param id       当前用户ID
+     * @param noticeId 通知ID
+     * @return 是否有权限
+     * @author demiphea
+     */
+    boolean checkNoticeAdminPermission(@Nullable Long id, @NotNull Long noticeId);
+
+    /**
+     * 校验通知管理权限
+     *
+     * @param id     当前用户ID
+     * @param notice 通知ID
+     * @return 是否有权限
+     * @author demiphea
+     */
+    boolean checkNoticeAdminPermission(@Nullable Long id, @NotNull Notice notice);
+
 }
