@@ -34,11 +34,16 @@ public class ServiceListener {
 
     private final ViewHistoryDao viewHistoryDao;
     private final PermissionService permissionService;
-    private final NoteFavoriteDao noteFavoriteDao;
-    private final CollectionFavoriteDao collectionFavoriteDao;
     private final CommentDao commentDao;
     private final CommentLikeDao commentLikeDao;
     private final NoticeDao noticeDao;
+    private final NoteDao noteDao;
+    private final CollectionDao collectionDao;
+    private final BillDao billDao;
+    private final UserDao userDao;
+    private final FollowDao followDao;
+    private final NoteFavoriteDao noteFavoriteDao;
+    private final CollectionFavoriteDao collectionFavoriteDao;
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue("notice::publish"),
@@ -48,19 +53,44 @@ public class ServiceListener {
     public void publishNotice(@NotNull NoticeBo noticeBo) {
         Notice notice = new Notice();
         notice.setType(noticeBo.getType().type);
+        Long targetId = null;  // 通知作用的目标用户
         switch (noticeBo.getType()) {
-            case FOLLOW -> notice.setLinkFollowId(noticeBo.getLinkId());
-            case NOTE_STAR -> notice.setLinkStarNoteId(noticeBo.getLinkId());
-            case COLLECTION_STAR -> notice.setLinkStarCollectionId(noticeBo.getLinkId());
-            case COMMENT -> notice.setLinkCommentId(noticeBo.getLinkId());
-            case LIKE -> notice.setLinkCommentLikeId(noticeBo.getLinkId());
-            case TRADE -> notice.setLinkBillId(noticeBo.getLinkId());
+            case FOLLOW -> {
+                notice.setLinkFollowId(noticeBo.getLinkId());
+                Follow follow = followDao.selectById(noticeBo.getLinkId());
+                targetId = follow.getFollowId();
+            }
+            case NOTE_STAR -> {
+                notice.setLinkStarNoteId(noticeBo.getLinkId());
+                NoteFavorite noteFavorite = noteFavoriteDao.selectById(noticeBo.getLinkId());
+                targetId = noteDao.selectById(noteFavorite.getNoteId()).getUserId();
+            }
+            case COLLECTION_STAR -> {
+                notice.setLinkStarCollectionId(noticeBo.getLinkId());
+                CollectionFavorite collectionFavorite = collectionFavoriteDao.selectById(noticeBo.getLinkId());
+                targetId = collectionDao.selectById(collectionFavorite.getCollectionId()).getUserId();
+            }
+            case COMMENT -> {
+                notice.setLinkCommentId(noticeBo.getLinkId());
+                Comment comment = commentDao.selectById(noticeBo.getLinkId());
+                targetId = commentDao.selectById(comment.getParentId()).getUserId();
+            }
+            case LIKE -> {
+                notice.setLinkCommentLikeId(noticeBo.getLinkId());
+                CommentLike commentLike = commentLikeDao.selectById(noticeBo.getLinkId());
+                targetId = commentDao.selectById(commentLike.getCommentId()).getUserId();
+            }
+            case TRADE -> {
+                notice.setLinkBillId(noticeBo.getLinkId());
+                Bill bill = billDao.selectById(noticeBo.getLinkId());
+                targetId = bill.getUserId();
+            }
 //            case ALL -> throw new CommonServiceException("不支持的通知类别");
             case ALL -> {
                 return;
             }
         }
-        notice.setUserId(noticeBo.getUserId());
+        notice.setUserId(targetId);
         notice.setCreateTime(LocalDateTime.now());
         notice.setRead(false);
         try {

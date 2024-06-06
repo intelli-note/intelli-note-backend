@@ -25,9 +25,4 @@ public class NoticeBo {
      */
     @NotNull
     private Long linkId;
-    /**
-     * 用户ID
-     */
-    @NotNull
-    private Long userId;
 }
