@@ -14,6 +14,12 @@
     </resultMap>
 
     <select id="hasBuy" resultType="java.lang.Boolean">
-        SELECT EXISTS(SELECT * FROM bill WHERE user_id = #{userId} AND note_id = #{noteId} AND type = 1);
+        SELECT EXISTS(SELECT * FROM bill WHERE user_id = #{userId} AND note_id = #{noteId} AND type = 1)
+    </select>
+
+    <select id="selectByIdWithDeleted" resultMap="bill">
+        SELECT id, type, amount, create_time, user_id, note_id, is_deleted
+        FROM bill
+        WHERE id = #{billId}
     </select>
 </mapper>

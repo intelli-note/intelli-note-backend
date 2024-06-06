@@ -18,4 +18,13 @@ public interface BillDao extends BaseMapper<Bill> {
      * @author demiphea
      */
     boolean hasBuy(Long userId, Long noteId);
+
+    /**
+     * 根据账单ID查找账单（包括已逻辑删除的账单）
+     *
+     * @param billId 账单ID
+     * @return {@link Bill} 账单
+     * @author demiphea
+     */
+    Bill selectByIdWithDeleted(Long billId);
 }

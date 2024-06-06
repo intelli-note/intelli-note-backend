@@ -310,7 +310,7 @@ public class BaseServiceImpl implements BaseService {
                 }
                 noticeVo.setType(NoticeType.TRADE);
                 BillNotice iNotice = new BillNotice();
-                Bill bill = billDao.selectById(notice.getLinkBillId());
+                Bill bill = billDao.selectByIdWithDeleted(notice.getLinkBillId());
                 iNotice.setBill(convert(id, bill));
                 noticeVo.setNotice(iNotice);
             }
