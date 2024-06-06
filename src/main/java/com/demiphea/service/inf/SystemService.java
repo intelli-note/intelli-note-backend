@@ -30,8 +30,7 @@ public interface SystemService {
      *
      * @param type   通知类型（不支持{@link NoticeType#ALL}）
      * @param linkId 关联ID
-     * @param userId 用户ID
      * @author demiphea
      */
-    void publishNotice(@NotNull NoticeType type, @NotNull Long linkId, @NotNull Long userId);
+    void publishNotice(@NotNull NoticeType type, @NotNull Long linkId);
 }

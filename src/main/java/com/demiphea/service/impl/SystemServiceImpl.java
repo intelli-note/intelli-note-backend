@@ -45,7 +45,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public void publishNotice(@NotNull NoticeType type, @NotNull Long linkId, @NotNull Long userId) {
-        template.convertAndSend(ServiceListener.EXCHANGE_NAME, "notice.publish", new NoticeBo(type, linkId, userId));
+    public void publishNotice(@NotNull NoticeType type, @NotNull Long linkId) {
+        template.convertAndSend(ServiceListener.EXCHANGE_NAME, "notice.publish", new NoticeBo(type, linkId));
     }
 }
