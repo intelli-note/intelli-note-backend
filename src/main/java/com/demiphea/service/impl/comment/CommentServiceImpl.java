@@ -105,11 +105,7 @@ public class CommentServiceImpl implements CommentService {
             // 刷新父评论的回复数
             messageQueueService.refreshComment(comment.getParentId());
         }
-        try {
-            systemService.publishNotice(NoticeType.COMMENT, comment.getId());
-        } catch (Exception e) {
-            // ignore
-        }
+        systemService.publishNotice(NoticeType.COMMENT, comment.getId());
         return baseService.convert(id, comment);
     }
 
