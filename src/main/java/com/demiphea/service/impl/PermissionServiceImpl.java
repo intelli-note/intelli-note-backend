@@ -25,6 +25,7 @@ public class PermissionServiceImpl implements PermissionService {
     private final CommentDao commentDao;
     private final CollectionDao collectionDao;
     private final FavoriteDao favoriteDao;
+    private final NoticeDao noticeDao;
 
     @Override
     public boolean checkBillAdminPermission(@Nullable Long userId, @NotNull Long billId) {
@@ -178,5 +179,22 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
         return checkFavoriteAdminPermission(id, favorite);
+    }
+
+    @Override
+    public boolean checkNoticeAdminPermission(@Nullable Long id, @NotNull Long noticeId) {
+        Notice notice = noticeDao.selectById(noticeId);
+        if (notice == null) {
+            throw new ObjectDoesNotExistException("通知不存在或已删除");
+        }
+        return checkNoticeAdminPermission(id, notice);
+    }
+
+    @Override
+    public boolean checkNoticeAdminPermission(@Nullable Long id, @NotNull Notice notice) {
+        if (id == null) {
+            return false;
+        }
+        return id.equals(notice.getUserId());
     }
 }

@@ -98,7 +98,7 @@ public class ServiceListener {
         }
         notice.setUserId(targetId);
         notice.setCreateTime(LocalDateTime.now());
-        notice.setRead(false);
+        notice.setReadTick(false);
         try {
             noticeDao.insert(notice);
         } catch (Exception e) {

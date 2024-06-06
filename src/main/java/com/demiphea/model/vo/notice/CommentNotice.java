@@ -62,7 +62,7 @@ public class CommentNotice implements INotice {
          */
         LIKE(1),
         ;
-        @JsonProperty
+
         public final int type;
 
         Type(int type) {
