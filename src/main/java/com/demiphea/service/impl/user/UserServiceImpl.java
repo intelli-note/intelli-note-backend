@@ -10,6 +10,7 @@ import com.demiphea.exception.user.BalanceDoesNotEnough;
 import com.demiphea.exception.user.Code2SessionException;
 import com.demiphea.exception.user.UserDoesNotExistException;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.bo.notice.NoticeType;
 import com.demiphea.model.bo.user.BillType;
 import com.demiphea.model.dto.user.WalletUpdateDto;
 import com.demiphea.model.vo.user.Credential;
@@ -130,14 +131,16 @@ public class UserServiceImpl implements UserService {
         switch (type) {
             case IN -> {
                 user.setBalance(user.getBalance().add(delta));
-                systemService.insertBill(id, BillType.DEPOSIT, delta, null);
+                Long billId = systemService.insertBill(id, BillType.DEPOSIT, delta, null);
+                systemService.publishNotice(NoticeType.TRADE, billId);
             }
             case OUT -> {
                 if (user.getBalance().compareTo(delta) < 0) {
                     throw new BalanceDoesNotEnough("用户余额不足");
                 }
                 user.setBalance(user.getBalance().subtract(delta));
-                systemService.insertBill(id, BillType.WITHDRAW, delta, null);
+                Long billId = systemService.insertBill(id, BillType.WITHDRAW, delta, null);
+                systemService.publishNotice(NoticeType.TRADE, billId);
             }
         }
         userDao.updateById(user);

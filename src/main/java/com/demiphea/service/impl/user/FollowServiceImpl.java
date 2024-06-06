@@ -5,8 +5,10 @@ import com.demiphea.dao.FollowDao;
 import com.demiphea.dao.UserDao;
 import com.demiphea.entity.Follow;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.bo.notice.NoticeType;
 import com.demiphea.model.vo.user.UserVo;
 import com.demiphea.service.inf.BaseService;
+import com.demiphea.service.inf.SystemService;
 import com.demiphea.service.inf.user.FollowService;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -30,12 +32,18 @@ public class FollowServiceImpl implements FollowService {
     private final BaseService baseService;
     private final FollowDao followDao;
     private final UserDao userDao;
+    private final SystemService systemService;
 
     @Override
     public void follow(@NotNull Long id, @NotNull Long targetId) {
         Follow follow = new Follow(null, id, targetId, LocalDateTime.now());
         try {
             followDao.insert(follow);
+        } catch (Exception e) {
+            // ignore
+        }
+        try {
+            systemService.publishNotice(NoticeType.FOLLOW, follow.getId());
         } catch (Exception e) {
             // ignore
         }

@@ -21,9 +21,10 @@ public interface SystemService {
      * @param type   账单类型
      * @param amount 金额
      * @param noteId 笔记ID
+     * @return {@link Long} 账单ID
      * @author demiphea
      */
-    void insertBill(@NotNull Long userId, @NotNull BillType type, @NotNull BigDecimal amount, @Nullable Long noteId);
+    Long insertBill(@NotNull Long userId, @NotNull BillType type, @NotNull BigDecimal amount, @Nullable Long noteId);
 
     /**
      * 发送通知（系统调用）

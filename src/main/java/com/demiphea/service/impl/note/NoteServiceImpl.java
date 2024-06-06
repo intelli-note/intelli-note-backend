@@ -12,6 +12,7 @@ import com.demiphea.exception.common.CommonServiceException;
 import com.demiphea.exception.common.ObjectDoesNotExistException;
 import com.demiphea.exception.common.PermissionDeniedException;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.bo.notice.NoticeType;
 import com.demiphea.model.bo.user.BillType;
 import com.demiphea.model.dto.note.QueryTypeDto;
 import com.demiphea.model.vo.note.NoteOverviewVo;
@@ -130,14 +131,25 @@ public class NoteServiceImpl implements NoteService {
         }
         user.setBalance(user.getBalance().subtract(note.getPrice()));
         userDao.updateById(user);
-        systemService.insertBill(id, BillType.EXPEND, note.getPrice(), noteId);
+        Long buyerBillId = systemService.insertBill(id, BillType.EXPEND, note.getPrice(), noteId);
 
         // seller
         User author = userDao.selectById(note.getUserId());
         author.setBalance(user.getBalance().add(note.getPrice()));
         author.setRevenue(user.getRevenue().add(note.getPrice()));
         userDao.updateById(author);
-        systemService.insertBill(note.getUserId(), BillType.INCOME, note.getPrice(), noteId);
+        Long sellerBillId = systemService.insertBill(note.getUserId(), BillType.INCOME, note.getPrice(), noteId);
+
+        try {
+            systemService.publishNotice(NoticeType.TRADE, buyerBillId);
+        } catch (Exception e) {
+            // ignore
+        }
+        try {
+            systemService.publishNotice(NoticeType.TRADE, sellerBillId);
+        } catch (Exception e) {
+            // ignore
+        }
 
         return baseService.convert(id, note);
     }

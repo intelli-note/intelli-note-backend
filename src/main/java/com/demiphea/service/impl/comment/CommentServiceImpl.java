@@ -10,11 +10,13 @@ import com.demiphea.entity.CommentLike;
 import com.demiphea.exception.common.CommonServiceException;
 import com.demiphea.exception.common.PermissionDeniedException;
 import com.demiphea.model.api.PageResult;
+import com.demiphea.model.bo.notice.NoticeType;
 import com.demiphea.model.dto.comment.CommentDto;
 import com.demiphea.model.vo.comment.CommentVo;
 import com.demiphea.service.inf.BaseService;
 import com.demiphea.service.inf.MessageQueueService;
 import com.demiphea.service.inf.PermissionService;
+import com.demiphea.service.inf.SystemService;
 import com.demiphea.service.inf.comment.CommentService;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -44,6 +46,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentDao commentDao;
     private final CommentLikeDao commentLikeDao;
     private final MessageQueueService messageQueueService;
+    private final SystemService systemService;
 
     private final Comparator<CommentVo> comparator = (a, b) -> {
         BigDecimal aScore = CommentSort.calcScore(a.getAgreeNumber(), a.getReplyNumber(), a.getCreateTime());
@@ -101,6 +104,11 @@ public class CommentServiceImpl implements CommentService {
         if (comment.getParentId() != null) {
             // 刷新父评论的回复数
             messageQueueService.refreshComment(comment.getParentId());
+        }
+        try {
+            systemService.publishNotice(NoticeType.COMMENT, comment.getId());
+        } catch (Exception e) {
+            // ignore
         }
         return baseService.convert(id, comment);
     }
@@ -160,13 +168,15 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void upVote(@NotNull Long id, @NotNull Long commentId) {
         try {
-            commentLikeDao.insert(new CommentLike(
+            CommentLike entity = new CommentLike(
                     null,
                     commentId,
                     id,
                     LocalDateTime.now()
-            ));
+            );
+            commentLikeDao.insert(entity);
             messageQueueService.refreshComment(commentId);
+            systemService.publishNotice(NoticeType.LIKE, entity.getId());
         } catch (Exception e) {
             // ignore
         }
