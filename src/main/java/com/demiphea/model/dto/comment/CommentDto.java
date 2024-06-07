@@ -26,7 +26,6 @@ import java.util.List;
 public class CommentDto {
     @NotNull(message = "需要传入评论所在的笔记ID")
     private Long noteId;
-    private Long rootId;
     private Long parentId;
 
     @NullOrNotBlank(message = "评论文本不为空")
