@@ -5,6 +5,8 @@ import com.aliyun.ocr_api20210707.Client;
 import com.aliyun.teaopenapi.models.Config;
 import com.demiphea.service.inf.MessageQueueService;
 import com.demiphea.utils.aliyun.AliyunProfile;
+import com.demiphea.utils.aliyun.ai.AIProfile;
+import com.demiphea.utils.aliyun.ai.AliYunQWenChatModel;
 import com.demiphea.utils.aliyun.nls.FileTransUtil;
 import com.demiphea.utils.aliyun.nls.NLSProfile;
 import com.demiphea.utils.aliyun.nls.SpeechFlashRecognizerUtil;
@@ -46,6 +48,7 @@ public class ApplicationStatusListener {
     private final OssProfile ossProfile;
     private final AliyunProfile aliyunProfile;
     private final NLSProfile nlsProfile;
+    private final AIProfile aiProfile;
     private final MinioProfile minioProfile;
     private final MiniProgramProfile miniProgramProfile;
     private final MessageQueueService messageQueueService;
@@ -57,6 +60,7 @@ public class ApplicationStatusListener {
         initHttpUtils();
         initAliyunNLSUtils();
         initAliyunOCRUtils();
+        initAliYunQWenChatModel();
         initMiniProgramUtils();
 
         syncES();
@@ -164,6 +168,12 @@ public class ApplicationStatusListener {
         CommonReflectionUtils.setStaticFieldValue(clazz,
                 "appSecret", miniProgramProfile.getAppSecret()
         );
+    }
+
+    private void initAliYunQWenChatModel() {
+        log.info("Init AliyunQwenChatModel...");
+        Class<AliYunQWenChatModel> clazz = AliYunQWenChatModel.class;
+        CommonReflectionUtils.setStaticFieldValue(clazz, "apikey", aiProfile.getApikey());
     }
 
     private void syncES() {

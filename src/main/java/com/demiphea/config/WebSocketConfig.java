@@ -1,5 +1,6 @@
 package com.demiphea.config;
 
+import com.demiphea.websocket.AISummaryWebsocket;
 import com.demiphea.websocket.NoticeWebsocket;
 import com.demiphea.websocket.interceptor.AuthInterceptor;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +22,14 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private final AuthInterceptor authInterceptor;
 
     private final NoticeWebsocket noticeWebsocket;
+    private final AISummaryWebsocket aiSummaryWebsocket;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(noticeWebsocket, "/notice")
+                .addInterceptors(authInterceptor);
+
+        registry.addHandler(aiSummaryWebsocket, "/ai/summary")
                 .addInterceptors(authInterceptor);
     }
 }
