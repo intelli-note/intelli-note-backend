@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -75,8 +76,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public CommentVo insertComment(@NotNull Long id, @NotNull CommentDto commentDto) {
         String imageList = commentDto.getImageList() != null ? JSON.toJSONString(commentDto.getImageList()) : null;
+        Long rootId = null;
+        if (commentDto.getParentId() != null) {
+            Comment parent = commentDao.selectById(commentDto.getParentId());
+            rootId = parent.getRootId() == null ? parent.getId() : parent.getRootId();
+        }
         Comment comment = new Comment(
                 null,
 
@@ -87,7 +94,7 @@ public class CommentServiceImpl implements CommentService {
                 commentDto.getLinkNoteId(),
 
                 commentDto.getNoteId(),
-                commentDto.getRootId(),
+                rootId,
                 commentDto.getParentId(),
                 id,
                 LocalDateTime.now(),
