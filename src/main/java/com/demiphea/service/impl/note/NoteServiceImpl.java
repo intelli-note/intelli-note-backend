@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.demiphea.common.Constant;
 import com.demiphea.dao.NoteDao;
 import com.demiphea.dao.UserDao;
-import com.demiphea.dao.ViewHistoryDao;
 import com.demiphea.entity.Note;
 import com.demiphea.entity.User;
 import com.demiphea.entity.ViewHistory;
@@ -49,13 +48,12 @@ public class NoteServiceImpl implements NoteService {
     private final SystemService systemService;
     private final MessageQueueService messageQueueService;
     private final NoteDao noteDao;
-    private final ViewHistoryDao viewHistoryDao;
     private final UserDao userDao;
     private final ElasticSearchService elasticSearchService;
 
     @Override
     public NoteOverviewVo insertNote(@NotNull Long id, @NotNull String title, @Nullable MultipartFile cover, @NotNull String content, @NotNull Boolean openPublic, @NotNull BigDecimal price) throws IOException {
-        String coverUrl = null;
+        String coverUrl = Constant.defaultNoteCover();
         if (cover != null) {
             coverUrl = OssUtils.upload(Constant.NOTE_COVER_DIR, null, cover);
         }
