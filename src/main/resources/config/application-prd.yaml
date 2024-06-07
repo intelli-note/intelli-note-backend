@@ -34,6 +34,8 @@ minio:
 aliyun:
   access-key: "your access-key"
   secret-key: "your secret-key"
+  ai:
+    api-key: "your api key"
   nls:
     app-key: "your nls project app-key"
 
