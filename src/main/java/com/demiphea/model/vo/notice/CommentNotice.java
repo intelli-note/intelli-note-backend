@@ -34,6 +34,11 @@ public class CommentNotice implements INotice {
      */
     private CommentVo target;
     /**
+     * 目标评论文本
+     */
+    @JsonProperty("target_text")
+    private String targetText;
+    /**
      * 评论所在上下文
      */
     private List<CommentVo> context;
