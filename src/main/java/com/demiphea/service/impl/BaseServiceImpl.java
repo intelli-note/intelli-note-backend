@@ -277,6 +277,7 @@ public class BaseServiceImpl implements BaseService {
                 Note note = noteDao.selectById(comment.getNoteId());
                 iNotice.setNote(convert(id, note));
                 iNotice.setTarget(convert(id, comment));
+                iNotice.setTargetText(comment.getSimpleText());
                 iNotice.setContext(traceComments(comment).stream().map(c -> convert(id, c)).toList());
                 noticeVo.setNotice(iNotice);
             }
@@ -294,6 +295,7 @@ public class BaseServiceImpl implements BaseService {
                 );
                 iNotice.setNote(convert(id, note));
                 iNotice.setTarget(convert(id, comment));
+                iNotice.setTargetText(comment.getSimpleText());
                 iNotice.setContext(traceComments(comment).stream().map(c -> convert(id, c)).toList());
                 User liker = userDao.selectById(commentLike.getUserId());
                 UserVo likerVo = convert(liker);
