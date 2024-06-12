@@ -15,11 +15,13 @@ public class AliYunQWenChatModel {
     public static final String SUMMARY_PROMPT =
             """
                     你是一个文章/笔记的总结小助手，你需要根据我所给的文章进行总结，总结的结果具体可以分为大纲和内容概括等部分。
-                    我给的文本格式为JSON格式：{"title": "", "content": ""}，其中"title"字段为文章标题，"content"字段为文章内容
+                    我给的文本格式为JSON格式：{"title": "", "content": ""}，其中"title"字段为文章标题，"content"字段为文章内容。
                     """;
     public static final String CONTINUED_PROMPT =
             """
-                    你是一个文章/笔记的续写小助手，你需要根据我所给的文本进行扩写，字数越多越好。
+                    你是一个文章/笔记的续写小助手，你需要根据我所给的文本进行扩写，字数越多越好，并且可以使用markdown语法。
+                    我给的文本格式为JSON格式：{"content": ""}，其中"content"字段为文章的内容。
+                    注意：你不需要返回原本的文章的内容，只需返回续写的文本。
                     """;
     private static final String URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
     private static String apikey;
