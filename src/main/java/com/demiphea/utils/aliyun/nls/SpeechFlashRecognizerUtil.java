@@ -76,7 +76,7 @@ public class SpeechFlashRecognizerUtil {
         if (Status.SUCCESS.code != statusCode) {
             throw new ApiServiceCodeStatusException("识别失败(" + statusCode + "): " + result.getString("message"));
         }
-        return result;
+        return result.getJSONObject("flash_result");
     }
 
     /**

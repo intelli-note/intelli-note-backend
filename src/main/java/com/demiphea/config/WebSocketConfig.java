@@ -1,5 +1,6 @@
 package com.demiphea.config;
 
+import com.demiphea.websocket.AIContinuedWebsocket;
 import com.demiphea.websocket.AISummaryWebsocket;
 import com.demiphea.websocket.NoticeWebsocket;
 import com.demiphea.websocket.interceptor.AuthInterceptor;
@@ -23,6 +24,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final NoticeWebsocket noticeWebsocket;
     private final AISummaryWebsocket aiSummaryWebsocket;
+    private final AIContinuedWebsocket aiContinuedWebsocket;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -30,6 +32,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 .addInterceptors(authInterceptor);
 
         registry.addHandler(aiSummaryWebsocket, "/ai/summary")
+                .addInterceptors(authInterceptor);
+
+        registry.addHandler(aiContinuedWebsocket, "/ai/continued")
                 .addInterceptors(authInterceptor);
     }
 }
